@@ -26,6 +26,11 @@ public class DbUtil {
 		}
 	}
 	
+	public static void initH2()throws Exception {
+		Connection conn = getConnection("h2");
+		
+	}
+	
 	/**
 	 * 获取数据库连接对象
 	 * @return

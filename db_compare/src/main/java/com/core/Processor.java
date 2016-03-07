@@ -41,12 +41,15 @@ public class Processor {
 			return;
 		}
 		Connection conn = DbUtil.getConnection("h2");
+		Statement stmt = null;
 		PreparedStatement pstmt = null;
 		try{
+			String versionDate = new SimpleDateFormat("yyyyMMdd").format(new Date());
 			conn.setAutoCommit(false);
+			stmt = conn.createStatement();
+			stmt.execute("DELETE FROM " + db.toUpperCase() + "_DB WHERE VERSION_DATE = '" + versionDate + "'");
 			pstmt = conn.prepareStatement("INSERT INTO " + db.toUpperCase() + "_DB(VERSION_DATE,TABLE_NAME,COLUMN_NAME"
 					+ ",COLUMN_TYPE,COLUMN_SIZE) VALUES(?,?,?,?,?)");
-			String versionDate = new SimpleDateFormat("yyyyMMdd").format(new Date());
 			long count = 0;
 			for(int i=0;i<tables.size();i++){
 				TableInfo ti = tables.get(i);
