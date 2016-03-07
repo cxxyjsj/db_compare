@@ -15,7 +15,7 @@ import java.util.Map;
 import java.util.Properties;
 
 public class DbUtil {
-	private static final Properties PROPS = new Properties();
+	public static final Properties PROPS = new Properties();
 	
 	static {
 		try {
