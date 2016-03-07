@@ -2,8 +2,6 @@ package com.core;
 
 import java.util.List;
 
-import org.codehaus.gram.hibernate.ColumnInfo;
-
 /**
  * 表信息
  * @author MX
@@ -40,6 +38,11 @@ public class TableInfo {
 
 	public void setColumns(List<ColumnInfo> columns) {
 		this.columns = columns;
+	}
+
+	@Override
+	public String toString() {
+		return "TableInfo [name=" + name + ", columns=" + columns + "]";
 	}
 }
  
