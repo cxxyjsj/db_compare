@@ -6,11 +6,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Bootstrap 101 Template</title>
     <link href="/bs/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/custom.css" rel="stylesheet">
   </head>
   <body>
   	<div class="container">
   		<div class="row">
   			<div class="col-md-12">
+  				<div class="btn-tools">
+  					<a href="javascript:;" class="btn btn-md btn-primary" name="add">新增</a>
+  				</div>
   				<table class="table table-bordered">
 			      <thead>
 			        <tr>
