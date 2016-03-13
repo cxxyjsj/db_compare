@@ -1,4 +1,4 @@
-package com.core;
+package com.domain;
 
 /**
  * 列信息

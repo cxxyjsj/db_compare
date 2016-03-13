@@ -1,4 +1,4 @@
-package com.core;
+package com.domain;
 
 import java.util.List;
 
