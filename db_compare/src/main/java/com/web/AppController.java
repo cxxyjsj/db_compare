@@ -8,6 +8,6 @@ public class AppController {
 	
 	@RequestMapping("/index")
 	public String index()throws Exception {
-		return "greeting";
+		return "index";
 	}
 }
