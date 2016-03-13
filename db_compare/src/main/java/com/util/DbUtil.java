@@ -1,7 +1,5 @@
 package com.util;
 
-import java.io.InputStreamReader;
-import java.nio.charset.Charset;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -12,23 +10,32 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
+/**
+ * 数据库工具类
+ * @author MX
+ *
+ */
 public class DbUtil {
-	public static final Properties PROPS = new Properties();
 	
-	static {
-		try {
-			PROPS.load(new InputStreamReader(DbUtil.class.getResourceAsStream("/db.properties"), Charset.forName("UTF-8")));
-			System.out.println("Load Properties Success");
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+	private static transient Log log = LogFactory.getLog(DbUtil.class);
+	
+	public static Connection getConn(String driver,String url,String user,String password)throws Exception {
+		Class.forName(driver);
+		return DriverManager.getConnection(url, user, password);
 	}
 	
-	public static void initH2()throws Exception {
-		Connection conn = getConnection("h2");
-		
+	/**
+	 * 获取内置数据库连接对象
+	 * @return
+	 * @throws Exception
+	 */
+	public static Connection getNativeConn()throws Exception {
+		Class.forName("org.h2.Driver");
+		return getConn("org.h2.Driver","jdbc:h2:./database", "SA", "");
 	}
 	
 	/**
@@ -36,30 +43,37 @@ public class DbUtil {
 	 * @return
 	 * @throws Exception
 	 */
-	public static Connection getConnection(String prefix)throws Exception {
-		String driverClass = PROPS.getProperty(prefix + ".driverClass");
-		String url = PROPS.getProperty(prefix + ".url");
-		String username = PROPS.getProperty(prefix + ".username");
-		String password = PROPS.getProperty(prefix + ".password");
-		Class.forName(driverClass);
-		return DriverManager.getConnection(url, username, password);
+	public static Connection getConn(String db_code)throws Exception {
+		Connection conn = getNativeConn();
+		try{
+			List<Map<String, Object>> datas = query(conn, "SELECT * FROM DB WHERE CODE = ?", db_code);
+			if(datas == null || datas.size() < 1){
+				return null;
+			}
+			Map<String, Object> data = datas.get(0);
+			String driver = (String)data.get("DRIVER");
+			String url = (String)data.get("URL");
+			String user = (String)data.get("USERNAME");
+			String password = (String)data.get("PASSWORD");
+			return getConn(driver, url, user, password);
+		}finally{
+			closeJdbc(new Connection[]{conn}, null, null);
+		}
 	}
 	
-	public static Connection getConn()throws Exception {
-		return getConnection("src");
-	}
-	
-	public static void main(String[] args)throws Exception {
-		System.out.println(getConn());
-	}
-	
+	/**
+	 * 关闭数据库资源
+	 * @param conns
+	 * @param stmts
+	 * @param rss
+	 */
 	public static void closeJdbc(Connection[] conns,Statement[] stmts, ResultSet[] rss){
 		if(rss != null && rss.length > 0){
 			for(int i=0;i<rss.length;i++){
 				try{
 					rss[i].close();
 				}catch(Exception e){
-					e.printStackTrace();
+					log.error(DbUtil.class,e);
 				}
 			}
 		}
@@ -68,7 +82,7 @@ public class DbUtil {
 				try{
 					stmts[i].close();
 				}catch(Exception e){
-					e.printStackTrace();
+					log.error(DbUtil.class,e);
 				}
 			}
 		}
@@ -77,7 +91,7 @@ public class DbUtil {
 				try{
 					conns[i].close();
 				}catch(Exception e){
-					e.printStackTrace();
+					log.error(DbUtil.class,e);
 				}
 			}
 		}
@@ -104,7 +118,7 @@ public class DbUtil {
 			ResultSetMetaData rsmd = rs.getMetaData();
 			List<String> names = new ArrayList<>();
 			for(int i=0;i<rsmd.getColumnCount();i++){
-				names.add(rsmd.getColumnLabel(i+1));
+				names.add(rsmd.getColumnLabel(i+1).toUpperCase());
 			}
 			List<Map<String, Object>> results = new ArrayList<>();
 			while(rs.next()){
