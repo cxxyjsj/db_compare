@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Bootstrap 101 Template</title>
+    <title>数据库配置</title>
     <link href="/bs/css/bootstrap.min.css" rel="stylesheet">
     <link href="/custom.css" rel="stylesheet">
   </head>
@@ -13,7 +13,7 @@
   		<div class="row">
   			<div class="col-md-12">
   				<div class="btn-tools">
-  					<a href="javascript:;" class="btn btn-md btn-primary" name="add">新增</a>
+  					<a href="javascript:;" class="btn btn-primary" name="add">新增</a>
   				</div>
   				<table class="table table-bordered">
 			      <thead>
