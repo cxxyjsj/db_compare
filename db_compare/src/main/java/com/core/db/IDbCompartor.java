@@ -13,17 +13,10 @@ import com.core.TableInfo;
 public interface IDbCompartor {
 	
 	/**
-	 * 设置数据库连接对象
-	 * @param conn
-	 * @throws Exception
-	 */
-	public void initConnection(Connection conn)throws Exception;
-	
-	/**
 	 * 查询所有表信息
 	 * @param namePattern 表明匹配模式
 	 * @return
 	 * @throws Exception
 	 */
-	public List<TableInfo> getTables(String namePattern)throws Exception;
+	public List<TableInfo> getTables(Connection conn,String namePattern)throws Exception;
 }

@@ -18,15 +18,8 @@ import com.util.DbUtil;
  */
 public class OracleDbCompartor implements IDbCompartor {
 	
-	private Connection conn;
-
 	@Override
-	public void initConnection(Connection conn) throws Exception {
-		this.conn = conn;
-	}
-
-	@Override
-	public List<TableInfo> getTables(String namePattern) throws Exception {
+	public List<TableInfo> getTables(Connection conn, String namePattern) throws Exception {
 		StringBuilder buf = new StringBuilder();
 		List<Object> params = new ArrayList<>(1);
 		buf.append("SELECT TABLE_NAME FROM USER_TABLES WHERE 1=1 ");
@@ -43,13 +36,20 @@ public class OracleDbCompartor implements IDbCompartor {
 			TableInfo ti = new TableInfo();
 			String tableName = (String)table.get("TABLE_NAME");
 			ti.setName(tableName);
-			ti.setColumns(getColumns(tableName));
+			ti.setColumns(getColumns(conn, tableName));
 			results.add(ti);
 		}
 		return results;
 	}
 	
-	private List<ColumnInfo> getColumns(String tableName)throws Exception {
+	/**
+	 * 获取数据表列信息
+	 * @param conn
+	 * @param tableName
+	 * @return
+	 * @throws Exception
+	 */
+	private List<ColumnInfo> getColumns(Connection conn, String tableName)throws Exception {
 		List<Map<String, Object>> datas = DbUtil.query(conn, "SELECT COLUMN_NAME,DATA_TYPE ,DATA_LENGTH FROM ALL_TAB_COLUMNS "
 				+ "WHERE TABLE_NAME = ?", tableName);
 		if(datas == null || datas.size() < 1){
@@ -68,5 +68,4 @@ public class OracleDbCompartor implements IDbCompartor {
 		}
 		return results;
 	}
-
 }
