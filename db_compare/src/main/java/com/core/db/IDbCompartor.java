@@ -1,7 +1,9 @@
-package com.core;
+package com.core.db;
 
 import java.sql.Connection;
 import java.util.List;
+
+import com.core.TableInfo;
 
 /**
  * 数据库对比接口

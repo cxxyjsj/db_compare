@@ -1,4 +1,4 @@
-package com.core.impl;
+package com.core.db;
 
 import java.sql.Connection;
 import java.util.ArrayList;
@@ -8,7 +8,6 @@ import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 
 import com.core.ColumnInfo;
-import com.core.IDbCompartor;
 import com.core.TableInfo;
 import com.util.DbUtil;
 
