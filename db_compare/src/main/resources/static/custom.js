@@ -280,6 +280,4 @@ $(function(){
 			delete currentRequest[token];
 		}
 	});
-	
-	$.initRouter($("#page-wrapper"));
 });

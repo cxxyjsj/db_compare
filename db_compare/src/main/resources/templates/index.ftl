@@ -60,4 +60,5 @@
   <script src="/plugins/jquery.md5.js"></script>
   <script src="/plugins/json2.js"></script>
   <script src="/custom.js"></script>
+  <script src="/index.js"></script>
 </html>

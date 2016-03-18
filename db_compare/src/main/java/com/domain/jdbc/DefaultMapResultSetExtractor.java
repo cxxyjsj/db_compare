@@ -1,4 +1,4 @@
-package com.domain;
+package com.domain.jdbc;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;

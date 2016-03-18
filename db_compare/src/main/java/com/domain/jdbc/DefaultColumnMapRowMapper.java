@@ -1,4 +1,4 @@
-package com.domain;
+package com.domain.jdbc;
 
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
@@ -7,7 +7,6 @@ import java.util.Map;
 
 import org.springframework.jdbc.core.ColumnMapRowMapper;
 import org.springframework.jdbc.support.JdbcUtils;
-import org.springframework.stereotype.Component;
 
 /**
  * 默认的查询结果集映射器,返回一个MAP对象
