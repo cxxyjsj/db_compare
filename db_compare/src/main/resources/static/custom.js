@@ -216,48 +216,6 @@ $.extend({
 				.split("\r").join("\\'")
 				+ "');}return p.join('');");
 		return data ? fn( data ) : fn;
-	},
-	// 包装dataTables控件
-	wrapTable : function($table,opts){
-		opts = $.extend({
-			responsive : true,
-			dom : 'T<"clear">frt<<"col-md-6"il><"col-md-6"p>>',
-			tableTools : {
-				sSwfPath : basePath + "/common/vendor/dataTables/swf/copy_csv_xls.swf",
-				aButtons : [
-					{
-						sButtonText : "导出Excel",
-						sExtends : "xls",
-						sFileName : "*.xls",
-						fnCellRender : function (sValue, iColumn, nTr, iDataIndex) {
-							if(iColumn == 0){
-								return '';
-							}
-							sValue = sValue || '';
-							return "=\"" + sValue.replace(/<\/?[^>]*>/g,'') + "\"";
-						}
-					}
-				],
-			},
-			language : {
-				emptyTable: '未查询到数据',  
-                loadingRecords: '加载中...',  
-                processing: '查询中...',  
-                search: '输入关键字检索:',  
-                lengthMenu: '每页 _MENU_ 条',  
-                zeroRecords: '未查询到数据',  
-                paginate: {  
-                    first:      '首页',  
-                    last:       '末页',  
-                    next:       '下一页',  
-                    previous:   '上一页'  
-                },  
-                info: '_PAGE_/_PAGES_页,从_START_到_END_,共_TOTAL_条记录. ',  
-                infoEmpty: '未查询到数据',  
-                infoFiltered: '(过滤总件数 _MAX_ 条)'  
-			}
-		},opts);
-		$table.dataTable(opts);
 	}
 });
 $(function(){
