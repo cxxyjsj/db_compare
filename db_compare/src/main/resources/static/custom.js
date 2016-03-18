@@ -216,6 +216,24 @@ $.extend({
 				.split("\r").join("\\'")
 				+ "');}return p.join('');");
 		return data ? fn( data ) : fn;
+	},
+	// 设置路由
+	initRouter : function($target,callback){
+		$target = $target || $("body");
+		var rt = Router();
+		rt.on(/(.*)/,function(path){
+			var hash = location.hash;
+			if(hash && hash.charAt(0) == "#"){
+				hash = hash.substr(1);
+			}
+			$.post(basePath + "/" + hash,function(html){
+				$target.html(html);
+				if(callback){
+					callback.call($target,path,html);
+				}
+			});
+		});
+		rt.init();
 	}
 });
 $(function(){
@@ -262,4 +280,6 @@ $(function(){
 			delete currentRequest[token];
 		}
 	});
+	
+	$.initRouter($("#page-wrapper"));
 });
