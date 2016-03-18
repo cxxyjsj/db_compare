@@ -28,6 +28,5 @@
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="lib" path="lib/ojdbc14.jar"/>
-	<classpathentry kind="lib" path="lib/h2-1.4.191.jar"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>

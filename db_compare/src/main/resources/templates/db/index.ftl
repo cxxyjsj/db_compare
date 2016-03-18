@@ -13,7 +13,7 @@
   <tbody>
   	<#list dbs as db>
   	<tr>
-      <th>${db.CODE}</th>
+      <td>${db.CODE}</th>
       <td>${db.NAME}</td>
       <td>${db.TYPE}</td>
       <td>

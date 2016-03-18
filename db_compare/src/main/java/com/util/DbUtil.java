@@ -11,17 +11,38 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.annotation.Resource;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.stereotype.Component;
+
+import com.domain.DefaultColumnMapRowMapper;
+import com.domain.DefaultMapResultSetExtractor;
 
 /**
  * 数据库工具类
  * @author MX
  *
  */
+@Component
+@Lazy(false)
 public class DbUtil {
 	
+	private static JdbcTemplate jdbcTemplate;
+	
 	private static transient Log log = LogFactory.getLog(DbUtil.class);
+	
+	public static final DefaultMapResultSetExtractor defaultMapResultSetExtractor = new DefaultMapResultSetExtractor();
+	
+	public static final DefaultColumnMapRowMapper defaultColumnMapRowMapper = new DefaultColumnMapRowMapper();
+	
+	@Resource
+	public void setJdbcTemplate(JdbcTemplate jdbcTemplate){
+		DbUtil.jdbcTemplate = jdbcTemplate;
+	}
 	
 	public static Connection getConn(String driver,String url,String user,String password)throws Exception {
 		Class.forName(driver);
@@ -29,13 +50,29 @@ public class DbUtil {
 	}
 	
 	/**
-	 * 获取内置数据库连接对象
+	 * 查询内置数据库信息
+	 * @author MX
+	 * @date 2016年3月18日 下午9:07:23
+	 * @param sql
+	 * @param params
 	 * @return
 	 * @throws Exception
 	 */
-	public static Connection getNativeConn()throws Exception {
-		Class.forName("org.h2.Driver");
-		return getConn("org.h2.Driver","jdbc:h2:./database", "SA", "");
+	public static List<Map<String, Object>> query(String sql, Object... params)throws Exception {
+		return jdbcTemplate.query(sql, params, defaultColumnMapRowMapper);
+	}
+	
+	/**
+	 * 查询内置数据库信息
+	 * @author MX
+	 * @date 2016年3月18日 下午9:08:08
+	 * @param sql
+	 * @param params
+	 * @return
+	 * @throws Exception
+	 */
+	public static Map<String, Object> queryRow(String sql, Object... params)throws Exception {
+		return jdbcTemplate.query(sql, params, defaultMapResultSetExtractor);
 	}
 	
 	/**
@@ -44,21 +81,15 @@ public class DbUtil {
 	 * @throws Exception
 	 */
 	public static Connection getConn(String db_code)throws Exception {
-		Connection conn = getNativeConn();
-		try{
-			List<Map<String, Object>> datas = query(conn, "SELECT * FROM DB WHERE CODE = ?", db_code);
-			if(datas == null || datas.size() < 1){
-				return null;
-			}
-			Map<String, Object> data = datas.get(0);
-			String driver = (String)data.get("DRIVER");
-			String url = (String)data.get("URL");
-			String user = (String)data.get("USERNAME");
-			String password = (String)data.get("PASSWORD");
-			return getConn(driver, url, user, password);
-		}finally{
-			closeJdbc(new Connection[]{conn}, null, null);
+		Map<String, Object> data = queryRow("SELECT * FROM DB WHERE CODE = ?", db_code);
+		if(data == null){
+			return null;
 		}
+		String driver = (String)data.get("DRIVER");
+		String url = (String)data.get("URL");
+		String user = (String)data.get("USERNAME");
+		String password = (String)data.get("PASSWORD");
+		return getConn(driver, url, user, password);
 	}
 	
 	/**
