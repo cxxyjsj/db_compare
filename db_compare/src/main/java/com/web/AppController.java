@@ -121,7 +121,7 @@ public class AppController {
 	@RequestMapping("/version")
 	public String version(ModelMap model)throws Exception {
 		StringBuilder buf = new StringBuilder();
-		buf.append("SELECT B.CODE AS DB_CODE,B.NAME AS DB_NAME,A.DESCR,A.CREATE_DATE,")
+		buf.append("SELECT A.ID,B.CODE AS DB_CODE,B.NAME AS DB_NAME,A.DESCR,A.CREATE_DATE,")
 		   .append("(SELECT COUNT(*) FROM DB_DETAIL WHERE VERSION_ID = A.ID) AS COUNT ")
 		   .append("FROM VERSION A LEFT JOIN DB B ON A.DB_ID = B.ID ORDER BY A.CREATE_DATE DESC");
 		model.put("versions", DbUtil.query(buf.toString()));
