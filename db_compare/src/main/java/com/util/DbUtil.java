@@ -27,6 +27,7 @@ import com.domain.SqlWrapper;
 import com.domain.jdbc.DefaultColumnMapRowMapper;
 import com.domain.jdbc.DefaultMapResultSetExtractor;
 import com.domain.jdbc.DefaultSingleRowResultSetExtractor;
+import com.domain.jdbc.DefaultSingleValueResultSetExtractor;
 
 /**
  * 数据库工具类
@@ -47,6 +48,8 @@ public class DbUtil {
 	public static final DefaultColumnMapRowMapper defaultColumnMapRowMapper = new DefaultColumnMapRowMapper();
 
 	public static final DefaultSingleRowResultSetExtractor defaultSingleRowResultSetExtractor = new DefaultSingleRowResultSetExtractor();
+	
+	public static final DefaultSingleValueResultSetExtractor defaultSingleValueResultSetExtractor = new DefaultSingleValueResultSetExtractor();
 	
 	@Resource
 	public void setJdbcTemplate(JdbcTemplate jdbcTemplate) {
@@ -84,6 +87,19 @@ public class DbUtil {
 	 */
 	public static Map<String, Object> queryRow(String sql, Object... params) throws Exception {
 		return jdbcTemplate.query(sql, params, defaultSingleRowResultSetExtractor);
+	}
+	
+	/**
+	 * 获取记录的第一行第一列
+	 * @author MX
+	 * @date 2016年3月19日 下午7:55:40
+	 * @param sql
+	 * @param params
+	 * @return
+	 * @throws Exception
+	 */
+	public static Object queryOne(String sql, Object... params)throws Exception {
+		return jdbcTemplate.query(sql, params, defaultSingleValueResultSetExtractor);
 	}
 
 	/**
@@ -127,28 +143,34 @@ public class DbUtil {
 	public static void closeJdbc(Connection[] conns, Statement[] stmts, ResultSet[] rss) {
 		if (rss != null && rss.length > 0) {
 			for (int i = 0; i < rss.length; i++) {
-				try {
-					rss[i].close();
-				} catch (Exception e) {
-					log.error(DbUtil.class, e);
+				if(rss[i] != null){
+					try {
+						rss[i].close();
+					} catch (Exception e) {
+						log.error(DbUtil.class, e);
+					}
 				}
 			}
 		}
 		if (stmts != null && stmts.length > 0) {
 			for (int i = 0; i < stmts.length; i++) {
-				try {
-					stmts[i].close();
-				} catch (Exception e) {
-					log.error(DbUtil.class, e);
+				if(stmts[i] != null){
+					try {
+						stmts[i].close();
+					} catch (Exception e) {
+						log.error(DbUtil.class, e);
+					}
 				}
 			}
 		}
 		if (conns != null && conns.length > 0) {
 			for (int i = 0; i < conns.length; i++) {
-				try {
-					conns[i].close();
-				} catch (Exception e) {
-					log.error(DbUtil.class, e);
+				if(conns[i] != null){
+					try {
+						conns[i].close();
+					} catch (Exception e) {
+						log.error(DbUtil.class, e);
+					}
 				}
 			}
 		}

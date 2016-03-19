@@ -6,8 +6,11 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.core.IDbCompartor;
 import com.core.VersionProcessor;
@@ -25,6 +28,8 @@ public class CompareService {
 	@Autowired
 	private VersionProcessor processor;
 	
+	private static transient Log log = LogFactory.getLog(CompareService.class);
+	
 	/**
 	 * 创建版本
 	 * @author MX
@@ -33,6 +38,7 @@ public class CompareService {
 	 * @param descr
 	 * @throws Exception
 	 */
+	@Transactional
 	public void createVersion(String dbid,String descr)throws Exception {
 		Map<String, Object> db = DbUtil.queryRow("SELECT * FROM DB WHERE ID = ?", dbid);
 		if(db == null){
@@ -49,14 +55,22 @@ public class CompareService {
 			if(idc == null){
 				throw new Exception("暂未支持的数据库类型:" + type);
 			}
-			conn = DbUtil.getConn(driver,url,username,password);
-			processor.process(conn, idc);
-			// 处理成功,插入版本信息
 			Map<String, Object> data = new HashMap<>();
 			data.put("DB_ID", dbid);
 			data.put("DESCR", descr);
-			data.put("CREATE_DATE", new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
+			String createDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
+			data.put("CREATE_DATE", createDate);
 			DbUtil.saveOrUpdate("VERSION", data);
+			String versionId = String.valueOf(DbUtil.queryOne("SELECT ID FROM VERSION WHERE DB_ID = ? AND CREATE_DATE = ?", dbid,createDate));
+			conn = DbUtil.getConn(driver,url,username,password);
+			conn.setAutoCommit(false);
+			processor.process(versionId,conn, idc);
+			conn.commit();
+		}catch(Exception e){
+			log.error(this,e);
+			if(conn != null){
+				conn.rollback();
+			}
 		}finally{
 			DbUtil.closeJdbc(new Connection[]{conn}, null, null);
 		}
