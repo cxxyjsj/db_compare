@@ -120,10 +120,20 @@ var version = {
 		});
 	},
 	del : function(id){
-		
+		$.confirm("确定删除该版本吗?",function(){
+			$.post(basePath + "/version/del/" + id,function(resp){
+				if(resp.success){
+					$.msg("删除成功",function(){
+						location.reload();
+					});
+				}else{
+					$.alert(resp.msg || "删除失败");
+				}
+			})
+		});
 	},
 	view : function(id){
-		
+		location.href = "#" + basePath + "/version/view/" + id;
 	}
 }
 

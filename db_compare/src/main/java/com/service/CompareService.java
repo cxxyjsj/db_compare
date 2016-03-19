@@ -75,4 +75,10 @@ public class CompareService {
 			DbUtil.closeJdbc(new Connection[]{conn}, null, null);
 		}
 	}
+	
+	@Transactional
+	public void deleteVersion(String id)throws Exception {
+		DbUtil.execute("DELETE FROM VERSION WHERE ID = ?",id);
+		DbUtil.execute("DELETE FROM DB_DETAIL WHERE VERSION_ID = ?", id);
+	}
 }
