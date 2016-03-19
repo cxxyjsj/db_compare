@@ -12,6 +12,7 @@
     </tr>
   </thead>
   <tbody>
+  	<#if dbs?size gt 0>
   	<#list dbs as db>
   	<tr mid="${db.ID}">
       <td>${db.CODE}</th>
@@ -23,6 +24,11 @@
       </td>
     </tr>
   	</#list>
+  	<#else>
+  	<tr>
+  		<td colspan="4" style="text-align:center;">暂无数据...</td>
+  	</tr>
+  	</#if>
   </tbody>
 </table>
 </div>

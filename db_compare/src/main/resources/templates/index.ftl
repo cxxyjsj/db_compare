@@ -6,6 +6,7 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link href="/bs/css/bootstrap.min.css" rel="stylesheet">
 	<link href="/ve/css/ve.css" rel="stylesheet">
+	<link href="/showLoading/css/showLoading.css" rel="stylesheet">
 	<link href="/custom.css" rel="stylesheet">
 	<link href="/admin/css/sb-admin-2.css" rel="stylesheet">
 	<link href="/fa/css/font-awesome.min.css" rel="stylesheet">
@@ -31,10 +32,10 @@
                             <a href="#db" class="active"><i class="fa fa-wrench fa-fw"></i>数据库配置</a>
                         </li>
                         <li>
-                            <a href="#" class="active"><i class="fa fa-dashboard fa-fw"></i>版本生成</a>
+                            <a href="#version" class="active"><i class="fa fa-dashboard fa-fw"></i>版本生成</a>
                         </li>
                         <li>
-                            <a href="#" class="active"><i class="fa fa-bar-chart-o fa-fw"></i>数据库比较</a>
+                            <a href="#compare" class="active"><i class="fa fa-bar-chart-o fa-fw"></i>数据库比较</a>
                         </li>
                     </ul>
                 </div>
@@ -55,6 +56,7 @@
   <script src="/layer/layer.js"></script>
   <script src="/ve/ve.js"></script>
   <script src="/ve/ve-zh_CN.js"></script>
+  <script src="/showLoading/js/jquery.showLoading.js"></script>
   <script src="/plugins/director.min.js"></script>
   <script src="/plugins/jquery.cookie.js"></script>
   <script src="/plugins/jquery.md5.js"></script>

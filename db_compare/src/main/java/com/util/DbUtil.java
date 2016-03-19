@@ -105,8 +105,8 @@ public class DbUtil {
 	 * @return
 	 * @throws Exception
 	 */
-	public static Connection getConn(String db_code) throws Exception {
-		Map<String, Object> data = queryRow("SELECT * FROM DB WHERE CODE = ?", db_code);
+	public static Connection getConn(String db_id) throws Exception {
+		Map<String, Object> data = queryRow("SELECT * FROM DB WHERE ID = ?", db_id);
 		if (data == null) {
 			return null;
 		}

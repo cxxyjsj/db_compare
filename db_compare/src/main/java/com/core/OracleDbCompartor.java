@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.stereotype.Service;
 
 import com.domain.ColumnInfo;
 import com.domain.TableInfo;
@@ -16,6 +17,7 @@ import com.util.DbUtil;
  * @author MX
  *
  */
+@Service("comparator.oracle")
 public class OracleDbCompartor implements IDbCompartor {
 	
 	@Override
