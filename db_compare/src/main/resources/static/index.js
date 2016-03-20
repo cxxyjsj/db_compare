@@ -146,6 +146,11 @@ var compare = {
 				compare.start();
 				break;
 			}
+		}).on("click",".btn-danger",function(){
+			var tableName = $(this).text();
+			$.post(basePath + "/compare/diff/" + tableName,function(html){
+				$("#diff").html(html);
+			});
 		});
 	},
 	start : function(){
@@ -166,7 +171,8 @@ var compare = {
 				}
 			}
 		});
-	}
+	},
+	
 }
 
 $(function(){

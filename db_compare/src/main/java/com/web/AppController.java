@@ -239,4 +239,18 @@ public class AppController {
 		}
 		return "compare/result";
 	}
+	
+	/**
+	 * 比较表结构不同
+	 * @param model
+	 * @param tableName
+	 * @return
+	 * @throws Exception
+	 */
+	@RequestMapping("/compare/diff/{tableName}")
+	public String compareTableDetail(ModelMap model,@PathVariable String tableName)throws Exception {
+		StringBuilder buf = new StringBuilder();
+		buf.append("SELECT ");
+		return "compare/table_diff";
+	}
 }
