@@ -28,6 +28,7 @@ import com.domain.jdbc.DefaultColumnMapRowMapper;
 import com.domain.jdbc.DefaultMapResultSetExtractor;
 import com.domain.jdbc.DefaultSingleRowResultSetExtractor;
 import com.domain.jdbc.DefaultSingleValueResultSetExtractor;
+import com.domain.jdbc.DefaultSingleValuesResultSetExtractor;
 
 /**
  * 数据库工具类
@@ -50,6 +51,8 @@ public class DbUtil {
 	public static final DefaultSingleRowResultSetExtractor defaultSingleRowResultSetExtractor = new DefaultSingleRowResultSetExtractor();
 	
 	public static final DefaultSingleValueResultSetExtractor defaultSingleValueResultSetExtractor = new DefaultSingleValueResultSetExtractor();
+	
+	public static final DefaultSingleValuesResultSetExtractor defaultSingleValuesResultSetExtractor = new DefaultSingleValuesResultSetExtractor();
 	
 	@Resource
 	public void setJdbcTemplate(JdbcTemplate jdbcTemplate) {
@@ -100,6 +103,17 @@ public class DbUtil {
 	 */
 	public static Object queryOne(String sql, Object... params)throws Exception {
 		return jdbcTemplate.query(sql, params, defaultSingleValueResultSetExtractor);
+	}
+	
+	/**
+	 * 查询第一列数据
+	 * @param sql
+	 * @param params
+	 * @return
+	 * @throws Exception
+	 */
+	public static List<Object> queryOnes(String sql, Object... params)throws Exception {
+		return jdbcTemplate.query(sql, params,defaultSingleValuesResultSetExtractor);
 	}
 
 	/**
@@ -226,6 +240,7 @@ public class DbUtil {
 		}
 		String id = (String) data.get("ID");
 		if (StringUtils.isEmpty(id)) {
+			data.remove("ID");
 			SqlWrapper sw = getInsertSql(tableName, data);
 			jdbcTemplate.update(sw.getSql(), sw.getParams().toArray());
 		} else {
@@ -253,6 +268,7 @@ public class DbUtil {
 			Map<String, Object> data = datas.get(i);
 			String id = (String) data.get("ID");
 			if (StringUtils.isEmpty(id)) {
+				data.remove("ID");
 				insertList.add(data);
 			} else {
 				updateList.add(data);

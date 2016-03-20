@@ -191,8 +191,51 @@ public class AppController {
 		String srcId = HttpUtil.getParameter("SRC_ID");
 		String tarId = HttpUtil.getParameter("TAR_ID");
 		String condition = HttpUtil.getParameter("CONDITION");
+		String cond = null;
+		if(!StringUtils.isEmpty(condition)){
+			cond = condition.replaceAll("@tableName", "TABLE_NAME");
+		}
 		if(!StringUtils.isEmpty(srcId) && !StringUtils.isEmpty(tarId)){
+			// 获取开发环境比现场环境多的表
+			StringBuilder buf = new StringBuilder();
+			buf.append("SELECT DISTINCT TABLE_NAME FROM DB_DETAIL WHERE VERSION_ID = ? ");
+			if(!StringUtils.isEmpty(cond)){
+				buf.append(" AND (").append(cond).append(") ");
+			}
+			buf.append(" AND TABLE_NAME NOT IN(")
+			   .append("SELECT DISTINCT TABLE_NAME FROM DB_DETAIL WHERE VERSION_ID = ? ");
+			if(!StringUtils.isEmpty(cond)){
+				buf.append(" AND (").append(cond).append(") ");
+			}
+			buf.append(")");
+			model.put("moreTables", DbUtil.queryOnes(buf.toString(), srcId,tarId));
 			
+			// 获取开发环境比现场环境少的表
+			model.put("lessTables", DbUtil.queryOnes(buf.toString(), tarId,srcId));
+			
+			// 获取差异的表
+			buf.setLength(0);
+			buf.append("SELECT DISTINCT TABLE_NAME FROM ((SELECT TABLE_NAME,COLUMN_NAME,COLUMN_TYPE,COLUMN_SIZE FROM DB_DETAIL WHERE VERSION_ID = ? ");
+			if(!StringUtils.isEmpty(cond)){
+				buf.append(" AND (").append(cond).append(") ");
+			}
+			buf.append(" MINUS ");
+			buf.append("SELECT TABLE_NAME,COLUMN_NAME,COLUMN_TYPE,COLUMN_SIZE FROM DB_DETAIL WHERE VERSION_ID = ? ");
+			if(!StringUtils.isEmpty(cond)){
+				buf.append(" AND (").append(cond).append(") ");
+			}
+			buf.append(") UNION ")
+			   .append("(SELECT TABLE_NAME,COLUMN_NAME,COLUMN_TYPE,COLUMN_SIZE FROM DB_DETAIL WHERE VERSION_ID = ? ");
+			if(!StringUtils.isEmpty(cond)){
+				buf.append(" AND (").append(cond).append(") ");
+			}
+			buf.append(" MINUS ")
+			   .append("SELECT TABLE_NAME,COLUMN_NAME,COLUMN_TYPE,COLUMN_SIZE FROM DB_DETAIL WHERE VERSION_ID = ? ");
+		    if(!StringUtils.isEmpty(cond)){
+		    	buf.append(" AND (").append(cond).append(") ");
+			} 
+			buf.append("))");
+			model.put("diffTables", DbUtil.queryOnes(buf.toString(), srcId, tarId,tarId,srcId));
 		}
 		return "compare/result";
 	}
