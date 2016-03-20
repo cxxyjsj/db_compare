@@ -137,6 +137,38 @@ var version = {
 	}
 }
 
+var compare = {
+	init : function(){
+		$("#compare_container").on("click","[op^='compare_']",function(){
+			var op = $(this).attr("op");
+			switch(op){
+			case 'compare_start' :
+				compare.start();
+				break;
+			}
+		});
+	},
+	start : function(){
+		$.dialog({
+			title : "数据库比较",
+			content : $("#compare_template").html(),
+			callback : function(op){
+				if(op == "ok"){
+					var srcId = this.find("[name='SRC_ID']").val();
+					var tarId = this.find("[name='TAR_ID']").val();
+					if(srcId == tarId){
+						$.alert("主数据库与从数据库相同,不需要比较");
+						return false;
+					}
+					$.post(basePath + "/compare/start",{SRC_ID : srcId, TAR_ID : tarId},function(html){
+						$("#result").html(html);
+					});
+				}
+			}
+		});
+	}
+}
+
 $(function(){
 	$.initRouter($("#page-wrapper"));
 });

@@ -166,4 +166,34 @@ public class AppController {
 		compareService.deleteVersion(id);
 		return Collections.singletonMap("success", true);
 	}
+	
+	/**
+	 * 进入比较页面
+	 * @param model
+	 * @return
+	 * @throws Exception
+	 */
+	@RequestMapping("/compare")
+	public String compare(ModelMap model)throws Exception {
+		model.put("versions", DbUtil.query("SELECT A.ID,B.CODE,B.NAME,A.CREATE_DATE FROM VERSION A "
+				+ "LEFT JOIN DB B ON A.DB_ID = B.ID ORDER BY A.CREATE_DATE DESC"));
+		return "compare/index";
+	}
+	
+	/**
+	 * 开始比较
+	 * @param model
+	 * @return
+	 * @throws Exception
+	 */
+	@RequestMapping("/compare/start")
+	public String compareStart(ModelMap model)throws Exception {
+		String srcId = HttpUtil.getParameter("SRC_ID");
+		String tarId = HttpUtil.getParameter("TAR_ID");
+		String condition = HttpUtil.getParameter("CONDITION");
+		if(!StringUtils.isEmpty(srcId) && !StringUtils.isEmpty(tarId)){
+			
+		}
+		return "compare/result";
+	}
 }
