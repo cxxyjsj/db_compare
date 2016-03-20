@@ -9,7 +9,7 @@
       <th>数据库名称</th>
       <th>版本说明</th>
       <th>备份时间</th>
-      <th>备份表总数</th>
+      <th>备份数</th>
       <th>操作</th>
     </tr>
   </thead>
@@ -21,7 +21,7 @@
       <td>${v.DB_NAME}</td>
       <td>${v.DESCR}</td>
       <td>${v.CREATE_DATE}</td>
-      <td>${v.COUNT}</td>
+      <td>表:${v.TABLE_COUNT}条 | 列:${v.TOTAL_COUNT}条</td>
       <td>
       	<a href="javascript:;" class="btn btn-sm btn-primary" op="version_view">查看</a>
       	<a href="javascript:;" class="btn btn-sm btn-danger" op="version_del">删除</a>

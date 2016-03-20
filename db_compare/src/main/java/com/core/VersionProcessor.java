@@ -30,7 +30,7 @@ public class VersionProcessor {
 			return;
 		}
 		jdbcTemplate.batchUpdate("INSERT INTO DB_DETAIL(VERSION_ID,TABLE_NAME,COLUMN_NAME,COLUMN_TYPE,COLUMN_SIZE) VALUES (?,?,?,?,?)", 
-				tables,100,new ParameterizedPreparedStatementSetter<TableInfo>() {
+				tables,10,new ParameterizedPreparedStatementSetter<TableInfo>() {
 				@Override
 				public void setValues(PreparedStatement pstmt, TableInfo table) throws SQLException {
 					List<ColumnInfo> cols = table.getColumns();
@@ -41,6 +41,7 @@ public class VersionProcessor {
 						pstmt.setObject(3, col.getName());
 						pstmt.setObject(4, col.getType());
 						pstmt.setObject(5, col.getSize());
+						pstmt.addBatch();
 					}
 				}
 		});
