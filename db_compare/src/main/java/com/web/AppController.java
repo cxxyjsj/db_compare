@@ -1,19 +1,27 @@
 package com.web;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.domain.ColumnInfo;
 import com.service.CompareService;
 import com.util.DbUtil;
 import com.util.HttpUtil;
@@ -29,6 +37,9 @@ public class AppController {
 	
 	@Autowired
 	private CompareService compareService;
+	
+	@Autowired
+	private JdbcTemplate jdbcTemplate;
 	
 	/**
 	 * 进入首页
@@ -196,6 +207,8 @@ public class AppController {
 			cond = condition.replaceAll("@tableName", "TABLE_NAME");
 		}
 		if(!StringUtils.isEmpty(srcId) && !StringUtils.isEmpty(tarId)){
+			model.put("srcId", srcId);
+			model.put("tarId", tarId);
 			// 获取开发环境比现场环境多的表
 			StringBuilder buf = new StringBuilder();
 			buf.append("SELECT DISTINCT TABLE_NAME FROM DB_DETAIL WHERE VERSION_ID = ? ");
@@ -247,10 +260,64 @@ public class AppController {
 	 * @return
 	 * @throws Exception
 	 */
-	@RequestMapping("/compare/diff/{tableName}")
-	public String compareTableDetail(ModelMap model,@PathVariable String tableName)throws Exception {
-		StringBuilder buf = new StringBuilder();
-		buf.append("SELECT ");
+	@RequestMapping("/compare/diff/{srcId}_{tarId}/{tableName}")
+	public String compareTableDetail(ModelMap model,@PathVariable String tableName,@PathVariable String srcId,
+			@PathVariable String tarId)throws Exception {
+		String sql = "SELECT COLUMN_NAME AS NAME,COLUMN_TYPE AS TYPE,COLUMN_SIZE AS SIZE FROM DB_DETAIL WHERE VERSION_ID = ? AND TABLE_NAME = ?";
+		
+		ResultSetExtractor<List<ColumnInfo>> rse = new ResultSetExtractor<List<ColumnInfo>>() {
+			@Override
+			public List<ColumnInfo> extractData(ResultSet rs) throws SQLException, DataAccessException {
+				List<ColumnInfo> list = new ArrayList<>();
+				while(rs.next()){
+					ColumnInfo col = new ColumnInfo();
+					col.setName(rs.getString("NAME"));
+					col.setType(rs.getString("TYPE"));
+					col.setSize(rs.getInt("SIZE"));
+					list.add(col);
+				}
+				return list;
+			}
+		};
+		
+		List<ColumnInfo> srcCols = jdbcTemplate.query(sql, new Object[]{srcId,tableName},rse);
+		List<ColumnInfo> tarCols = jdbcTemplate.query(sql, new Object[]{tarId,tableName},rse);
+		
+		List<ColumnInfo> distCols = new ArrayList<>();
+		if(srcCols != null && srcCols.size() > 0){
+			for(int i=0;i<srcCols.size();i++){
+				ColumnInfo ci = srcCols.get(i);
+				if(!distCols.contains(ci)){
+					ci.setDb("SRC");
+					distCols.add(ci);
+				}
+			}
+		}
+		if(tarCols != null && tarCols.size() > 0){
+			for(int i=0;i<tarCols.size();i++){
+				ColumnInfo ci = tarCols.get(i);
+				if(distCols.contains(ci)){
+					distCols.remove(ci);
+				}else{
+					distCols.add(ci);
+				}
+			}
+		}
+		Map<String, Map<String,Object>> map = new HashMap<>();
+		for(int i=0;i<distCols.size();i++){
+			ColumnInfo col = distCols.get(i);
+			String name = col.getName();
+			Map<String, Object> m = map.get(name);
+			if(m == null){
+				m = new HashMap<>();
+				map.put(name, m);
+			}
+			String db = col.getDb();
+			m.put(db + "_NAME", col.getName());
+			m.put(db + "_TYPE", col.getType());
+			m.put(db + "_SIZE", col.getSize());
+		}
+		model.put("cols", map.values());
 		return "compare/table_diff";
 	}
 }

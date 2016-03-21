@@ -148,7 +148,10 @@ var compare = {
 			}
 		}).on("click",".btn-danger",function(){
 			var tableName = $(this).text();
-			$.post(basePath + "/compare/diff/" + tableName,function(html){
+			var $parent = $(this).parent();
+			var srcId = $parent.attr("srcId");
+			var tarId = $parent.attr("tarId");
+			$.post(basePath + "/compare/diff/" + srcId + "_" + tarId + "/" + tableName,function(html){
 				$("#diff").html(html);
 			});
 		});

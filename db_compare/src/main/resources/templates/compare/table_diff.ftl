@@ -11,14 +11,18 @@
 		    </tr>
 		  </thead>
 		  <tbody>
-		  	<#if cols?size gt 0>
+		  	<#if cols?? && cols?size gt 0>
 		  	<#list cols as col>
 		  	<tr>
-		  	  <td <#if col.SRC_NAME ne col.TAR_NAME>class="red"</#if>>${col.SRC_NAME}|${col.TAR_NAME}</td>
-		  	  <td <#if col.SRC_TYPE ne col.TAR_TYPE>class="red"</#if>>${col.SRC_TYPE}|${col.TAR_TYPE}</td>
-		  	  <td <#if col.SRC_SIZE ne col.TAR_SIZE>class="red"</#if>>${col.SRC_SIZE}|${col.TAR_SIZE}</td>
+		  	  <td>${col.SRC_NAME!}|${col.TAR_NAME!}</td>
+		  	  <td>${col.SRC_TYPE!}|${col.TAR_TYPE!}</td>
+		  	  <td>${col.SRC_SIZE!}|${col.TAR_SIZE!}</td>
 		  	</tr>
 		  	</#list>
+		  	<#else>
+		  	<tr>
+		  	  <td colspan="3" style="text-align:center;">未查询到数据...</td>
+		  	</tr>
 		  	</#if>
 		  </tbody>
 		</table>

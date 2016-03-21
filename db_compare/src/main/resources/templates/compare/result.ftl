@@ -26,7 +26,7 @@
 	<div class="col-md-4">
 		<div class="panel panel-default">
 		  <div class="panel-heading">主版本比目标版本差异的表名</div>
-		  <div class="panel-body">
+		  <div class="panel-body" srcId="${srcId}" tarId="${tarId}">
 		    <#if diffTables?size gt 0>
 		    <#list diffTables as t>
 		    <button type="button" class="btn btn-danger btn-xs">${t}</button>
