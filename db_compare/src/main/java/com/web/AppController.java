@@ -220,7 +220,7 @@ public class AppController {
 			if(!StringUtils.isEmpty(cond)){
 				buf.append(" AND (").append(cond).append(") ");
 			}
-			buf.append(")");
+			buf.append(") ORDER BY TABLE_NAME");
 			model.put("moreTables", DbUtil.queryOnes(buf.toString(), srcId,tarId));
 			
 			// 获取开发环境比现场环境少的表
