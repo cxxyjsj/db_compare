@@ -52,10 +52,9 @@
 	<div class="col-md-4">
 		<div class="panel panel-default">
 		  <div class="panel-heading">主版本比目标版本差异的表名</div>
-		  <div class="panel-body" srcId="${srcId}" tarId="${tarId}">
+		  <div class="panel-body">
 		    <#if diffTables?size gt 0>
-		    <#list diffTables as t>
-		    <table class="table table-condensed">
+		    <table class="table table-condensed" id="diffTable" srcId="${srcId}" tarId="${tarId}">
 		    	<thead>
 		    		<tr>
 		    			<th width="30px">#</th>
@@ -71,11 +70,8 @@
 				    </#list>
 		    	</tbody>
 		    </table>
-		    </#list>
 		    </#if>
 		  </div>
 		</div>
 	</div>
-</div>
-<div class="row" id="diff">
 </div>

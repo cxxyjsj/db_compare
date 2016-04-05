@@ -22,7 +22,7 @@
 	        <select class="form-control validate[required]" name="TAR_ID">
 	        	<#if versions?size gt 0>
 	        	<#list versions as v>
-	        	<option value="${v.ID}">${v.CODE}(${v.NAME}) - [${v.CREATE_DATE}]</option>
+	        	<option value="${v.ID}" <#if v_index == 1>selected="selected"</#if>>${v.CODE}(${v.NAME}) - [${v.CREATE_DATE}]</option>
 	        	</#list>
 	        	</#if>
 	        </select>

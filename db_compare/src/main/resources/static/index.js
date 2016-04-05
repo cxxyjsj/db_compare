@@ -146,13 +146,17 @@ var compare = {
 				compare.start();
 				break;
 			}
-		}).on("click",".btn-danger",function(){
-			var tableName = $(this).text();
-			var $parent = $(this).parent();
+		}).on("click","#diffTable tr",function(){
+			var tableName = $(this).find("td:eq(1)").text();
+			var $parent = $(this).closest("table");
 			var srcId = $parent.attr("srcId");
 			var tarId = $parent.attr("tarId");
 			$.post(basePath + "/compare/diff/" + srcId + "_" + tarId + "/" + tableName,function(html){
-				$("#diff").html(html);
+				$.dialog({
+					title : '表结构对比',
+					large : true,
+					content : html
+				});
 			});
 		});
 	},
