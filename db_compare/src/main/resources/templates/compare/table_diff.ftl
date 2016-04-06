@@ -10,9 +10,9 @@
   	<#if cols?? && cols?size gt 0>
   	<#list cols as col>
   	<tr>
-  	  <td>${col.SRC_NAME!}|${col.TAR_NAME!}</td>
-  	  <td>${col.SRC_TYPE!}|${col.TAR_TYPE!}</td>
-  	  <td>${col.SRC_SIZE!}|${col.TAR_SIZE!}</td>
+  	  <td>${col.SRC_NAME!"无"}|${col.TAR_NAME!"无"}</td>
+  	  <td>${col.SRC_TYPE!"无"}|${col.TAR_TYPE!"无"}</td>
+  	  <td>${col.SRC_SIZE!"无"}|${col.TAR_SIZE!"无"}</td>
   	</tr>
   	</#list>
   	<#else>
