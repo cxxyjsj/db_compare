@@ -247,8 +247,9 @@ public class AppController {
 		    if(!StringUtils.isEmpty(cond)){
 		    	buf.append(" AND (").append(cond).append(") ");
 			} 
-			buf.append("))");
-			model.put("diffTables", DbUtil.queryOnes(buf.toString(), srcId, tarId,tarId,srcId));
+			buf.append(")) WHERE TABLE_NAME IN(SELECT DISTINCT TABLE_NAME FROM DB_DETAIL WHERE VERSION_ID = ? AND TABLE_NAME IN(")
+			.append("SELECT DISTINCT TABLE_NAME FROM DB_DETAIL WHERE VERSION_ID = ?))");
+			model.put("diffTables", DbUtil.queryOnes(buf.toString(), srcId, tarId,tarId,srcId, srcId, tarId));
 		}
 		return "compare/result";
 	}
@@ -299,6 +300,7 @@ public class AppController {
 				if(distCols.contains(ci)){
 					distCols.remove(ci);
 				}else{
+					ci.setDb("TAR");
 					distCols.add(ci);
 				}
 			}
