@@ -52,7 +52,7 @@ public class OracleDbCompartor implements IDbCompartor {
 	 * @throws Exception
 	 */
 	private List<ColumnInfo> getColumns(Connection conn, String tableName)throws Exception {
-		List<Map<String, Object>> datas = DbUtil.query(conn, "SELECT COLUMN_NAME,DATA_TYPE ,DATA_LENGTH FROM ALL_TAB_COLUMNS "
+		List<Map<String, Object>> datas = DbUtil.query(conn, "SELECT COLUMN_NAME,DATA_TYPE ,DATA_LENGTH FROM USER_TAB_COLUMNS "
 				+ "WHERE TABLE_NAME = ?", tableName);
 		if(datas == null || datas.size() < 1){
 			return null;
