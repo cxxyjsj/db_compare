@@ -16,6 +16,9 @@ var db = {
 			case 'db_add' : 
 				db.edit();
 				break;
+			case 'db_test' :
+				db.test(mid);
+				break;
 			}
 		});
 	},
@@ -64,6 +67,15 @@ var db = {
 						}
 					}
 				});
+			}
+		});
+	},
+	test : function(id){
+		$.post(basePath + "/db/test/" + id,function(resp){
+			if(resp.success){
+				$.alert("连接成功");
+			}else{
+				$.alert("连接失败");
 			}
 		});
 	}

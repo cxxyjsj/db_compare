@@ -121,6 +121,18 @@ public class AppController {
 		return model;
 	}
 	
+	@RequestMapping("/db/test/{id}")
+	public @ResponseBody Object dbTest(@PathVariable String id)throws Exception {
+		Map<String, Object> retVal = new HashMap<>();
+		try{
+			DbUtil.getConn(id);
+			retVal.put("success", true);
+		}catch(Exception e){
+			
+		}
+		return retVal;
+	}
+	
 	/**
 	 * 进入版本控制页面
 	 * @author MX

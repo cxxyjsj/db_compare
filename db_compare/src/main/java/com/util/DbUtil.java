@@ -61,6 +61,7 @@ public class DbUtil {
 
 	public static Connection getConn(String driver, String url, String user, String password) throws Exception {
 		Class.forName(driver);
+		DriverManager.setLoginTimeout(2);
 		return DriverManager.getConnection(url, user, password);
 	}
 
