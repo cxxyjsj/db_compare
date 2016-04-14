@@ -25,6 +25,7 @@ import com.domain.ColumnInfo;
 import com.service.CompareService;
 import com.util.DbUtil;
 import com.util.HttpUtil;
+import com.util.JsonUtil;
 
 /**
  * 前端控制器
@@ -83,6 +84,8 @@ public class AppController {
 		if(!StringUtils.isEmpty(id)){
 			Map<String, Object> data = DbUtil.queryRow("SELECT * FROM DB WHERE ID = ?", id);
 			model.put("data", data);
+		}else{
+			model.put("db_conf", JsonUtil.toJsonStr(DbUtil.DB_PROPS));
 		}
 		return "db/edit";
 	}

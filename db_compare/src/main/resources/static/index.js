@@ -46,6 +46,17 @@ var db = {
 					content : html,
 					beforeShow : function(){
 						this.find("form").validationEngine();
+						if(!id){
+							var mapping = $.toJson($("#db_conf",this).val());
+							var $dialog = this;
+							$("[name='TYPE']",this).change(function(){
+								var type = $(this).val();
+								var $driver = $("[name='DRIVER']",$dialog);
+								var $url = $("[name='URL']",$dialog);
+								$driver.val(mapping[type + ".driver"] || '');
+								$url.val(mapping[type + ".url"] || '');
+							});
+						}
 					},
 					callback : function(op){
 						var $dialog = this;

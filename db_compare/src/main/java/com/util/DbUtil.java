@@ -1,5 +1,7 @@
 package com.util;
 
+import java.io.InputStreamReader;
+import java.nio.charset.Charset;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -12,6 +14,7 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 
 import javax.annotation.Resource;
 
@@ -53,6 +56,17 @@ public class DbUtil {
 	public static final DefaultSingleValueResultSetExtractor defaultSingleValueResultSetExtractor = new DefaultSingleValueResultSetExtractor();
 	
 	public static final DefaultSingleValuesResultSetExtractor defaultSingleValuesResultSetExtractor = new DefaultSingleValuesResultSetExtractor();
+	
+	public static final Properties DB_PROPS = new Properties();
+	
+	static{
+		try {
+			DB_PROPS.load(new InputStreamReader(DbUtil.class.getResourceAsStream("/db_drivers"), 
+					Charset.forName("UTF-8")));
+		} catch (Exception e) {
+			log.error(DbUtil.class,e);
+		}
+	}
 	
 	@Resource
 	public void setJdbcTemplate(JdbcTemplate jdbcTemplate) {
