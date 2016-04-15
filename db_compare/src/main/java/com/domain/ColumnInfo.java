@@ -82,19 +82,4 @@ public class ColumnInfo {
 		ColumnInfo ci = (ColumnInfo)obj;
 		return this.name.equals(ci.getName()) && this.type.equals(ci.getType()) && this.size == ci.getSize();
 	}
-	
-	public static void main(String[] args) {
-		ColumnInfo c1 = new ColumnInfo();
-		c1.setName("1");
-		c1.setType("2");
-		ColumnInfo c2 = new ColumnInfo();
-		c2.setName("1");
-		c2.setType("2");
-		List<ColumnInfo> list = new ArrayList<>();
-		list.add(c1);
-		if(!list.contains(c2)){
-			list.add(c2);
-		}
-		System.out.println(list);
-	}
 }
