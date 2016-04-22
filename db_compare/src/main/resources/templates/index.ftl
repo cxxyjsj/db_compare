@@ -10,6 +10,7 @@
 	<link href="/custom.css" rel="stylesheet">
 	<link href="/admin/css/sb-admin-2.css" rel="stylesheet">
 	<link href="/fa/css/font-awesome.min.css" rel="stylesheet">
+	<link href="/uploadify/uploadify.css" rel="stylesheet">
     <title>数据库结构对比工具V1.0</title>
   </head>
   <body>
@@ -57,6 +58,7 @@
   <script src="/ve/ve.js"></script>
   <script src="/ve/ve-zh_CN.js"></script>
   <script src="/showLoading/js/jquery.showLoading.js"></script>
+  <script src="/uploadify/jquery.uploadify.js"></script>
   <script src="/plugins/director.min.js"></script>
   <script src="/plugins/jquery.cookie.js"></script>
   <script src="/plugins/jquery.md5.js"></script>

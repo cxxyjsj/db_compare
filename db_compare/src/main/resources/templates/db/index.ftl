@@ -19,7 +19,7 @@
       <td>${db.NAME}</td>
       <td>${db.TYPE}</td>
       <td>
-      	<a href="javascript:;" class="btn btn-sm btn-primary" op="db_test">测试</a>
+      	<a href="javascript:;" class="btn btn-sm btn-primary" op="db_test">测试连接</a>
       	<a href="javascript:;" class="btn btn-sm btn-info" op="db_edit">修改</a>
       	<a href="javascript:;" class="btn btn-sm btn-danger" op="db_del">删除</a>
       </td>

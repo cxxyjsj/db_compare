@@ -1,6 +1,7 @@
 <div id="version_container">
 <div class="btn-tools">
 	<a href="javascript:;" class="btn btn-primary" op="version_add">新增</a>
+	<a href="javascript:;" class="btn btn-info" op="version_import">导入</a>
 </div>
 <table class="table table-bordered" id="dbTable">
   <thead>
