@@ -51,7 +51,29 @@
 	    </div>
 	    <div class="form-group">
 	        <label>版本说明</label>
-	        <textarea class="form-control validate[required]" name="DESCR"></textarea>
+	        <textarea class="form-control" name="DESCR"></textarea>
+	    </div>
+    </form>
+</div>
+<div class="template" id="import_template">
+	<form>
+		<div class="form-group">
+	        <label>选择数据库</label>
+	        <select class="form-control validate[required]" name="DB_ID">
+	        	<#if dbs?size gt 0>
+	        	<#list dbs as db>
+	        	<option value="${db.ID}">${db.CODE}(${db.NAME})</option>
+	        	</#list>
+	        	</#if>
+	        </select>
+	    </div>
+	    <div class="form-group">
+	        <label>版本说明</label>
+	        <textarea class="form-control" name="DESCR"></textarea>
+	    </div>
+	    <div class="form-group">
+	    	<label>选择文件</label>
+	    	<input type="file" id="file" name="file">
 	    </div>
     </form>
 </div>

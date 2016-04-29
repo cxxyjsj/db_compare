@@ -86,6 +86,16 @@ public class HttpUtil {
 	public static String getReferUrl() {
 		return getRequest().getHeader("Referer");
 	}
+	
+	/**
+	 * 判断是否ajax请求
+	 * @author mengbin
+	 * @date 2016年4月29日 下午12:06:08
+	 * @return
+	 */
+	public static boolean isAjaxRequest() {
+		return "XMLHttpRequest".equals(getRequest().getHeader("X-Requested-With"));
+	}
 
 	/**
 	 * 获取WEB真实路径
