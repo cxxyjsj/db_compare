@@ -177,9 +177,6 @@ public class AppController {
 			throw new Exception("请选择数据库");
 		}
 		String descr = HttpUtil.getParameter("DESCR");
-		if(StringUtils.isEmpty(descr)){
-			throw new Exception("版本描述不能为空");
-		}
 		compareService.createVersion(dbid, descr);
 		model.put("success", true);
 		return model;
