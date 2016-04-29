@@ -11,6 +11,8 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -37,6 +39,8 @@ import com.util.StringUtil;
 @Controller()
 @RequestMapping("/")
 public class AppController {
+	
+	private static transient Log log = LogFactory.getLog(AppController.class);
 	
 	@Autowired
 	private CompareService compareService;
@@ -133,7 +137,7 @@ public class AppController {
 			DbUtil.getConn(id);
 			retVal.put("success", true);
 		}catch(Exception e){
-			
+			log.error(this,e);
 		}
 		return retVal;
 	}
