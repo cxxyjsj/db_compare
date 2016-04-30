@@ -3,7 +3,7 @@ package com.core;
 import java.sql.Connection;
 import java.util.List;
 
-import com.domain.TableInfo;
+import com.domain.ColumnInfo;
 
 /**
  * 数据库对比接口
@@ -18,5 +18,5 @@ public interface IDbCompartor {
 	 * @return
 	 * @throws Exception
 	 */
-	public List<TableInfo> getTables(Connection conn,String namePattern)throws Exception;
+	public List<ColumnInfo> getColumns(Connection conn,String namePattern)throws Exception;
 }

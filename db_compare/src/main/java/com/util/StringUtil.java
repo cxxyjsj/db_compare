@@ -1,6 +1,8 @@
 package com.util;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author mengbin
@@ -16,5 +18,18 @@ public class StringUtil {
 			}
 		}
 		return buf.toString();
+	}
+	
+	public static Map<String, Map<String,Object>> convertList(List<Map<String, Object>> datas, String key) {
+		Map<String, Map<String,Object>> results = new HashMap<>();
+		for(Map<String, Object> data : datas){
+			String name = (String)data.get(key);
+			results.put(name, data);
+		}
+		return results;
+	}
+	
+	public static String defaultValue(Object value){
+		return value == null ? "" : String.valueOf(value);
 	}
 }

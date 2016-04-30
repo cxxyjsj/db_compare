@@ -1,14 +1,16 @@
 package com.domain;
 
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  * 列信息
  * @author MX
  *
  */
 public class ColumnInfo {
+	/**
+	 * 表名
+	 */
+	private String tableName;
+	
 	/**
 	 * 列名
 	 */
@@ -58,12 +60,21 @@ public class ColumnInfo {
 		this.size = size;
 	}
 
+	public String getTableName() {
+		return tableName;
+	}
+
+	public void setTableName(String tableName) {
+		this.tableName = tableName;
+	}
+
 	public ColumnInfo() {
 
 	}
 
-	public ColumnInfo(String name, String type, int size) {
+	public ColumnInfo(String tableName,String name, String type, int size) {
 		super();
+		this.tableName = tableName;
 		this.name = name;
 		this.type = type;
 		this.size = size;
@@ -71,7 +82,7 @@ public class ColumnInfo {
 
 	@Override
 	public String toString() {
-		return "ColumnInfo [name=" + name + ", type=" + type + ", size=" + size + "]";
+		return "ColumnInfo [tableName=" + tableName + ",name=" + name + ", type=" + type + ", size=" + size + "]";
 	}
 
 	@Override
@@ -80,6 +91,6 @@ public class ColumnInfo {
 			return false;
 		}
 		ColumnInfo ci = (ColumnInfo)obj;
-		return this.name.equals(ci.getName()) && this.type.equals(ci.getType()) && this.size == ci.getSize();
+		return this.tableName.equals(ci.getTableName()) && this.name.equals(ci.getName()) && this.type.equals(ci.getType()) && this.size == ci.getSize();
 	}
 }

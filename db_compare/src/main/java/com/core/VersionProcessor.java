@@ -11,7 +11,6 @@ import org.springframework.jdbc.core.ParameterizedPreparedStatementSetter;
 import org.springframework.stereotype.Component;
 
 import com.domain.ColumnInfo;
-import com.domain.TableInfo;
 
 /**
  * 版本处理器
@@ -25,23 +24,19 @@ public class VersionProcessor {
 	private JdbcTemplate jdbcTemplate;
 	
 	public void process(String versionId,Connection conn, IDbCompartor compartor)throws Exception {
-		final List<TableInfo> tables = compartor.getTables(conn, null);
-		if(tables == null || tables.size() < 1){
+		final List<ColumnInfo> columns = compartor.getColumns(conn, null);
+		if(columns == null || columns.size() < 1){
 			return;
 		}
 		jdbcTemplate.batchUpdate("INSERT INTO DB_DETAIL(VERSION_ID,TABLE_NAME,COLUMN_NAME,COLUMN_TYPE,COLUMN_SIZE) VALUES (?,?,?,?,?)", 
-				tables,20,new ParameterizedPreparedStatementSetter<TableInfo>() {
+				columns,100,new ParameterizedPreparedStatementSetter<ColumnInfo>() {
 				@Override
-				public void setValues(PreparedStatement pstmt, TableInfo table) throws SQLException {
-					List<ColumnInfo> cols = table.getColumns();
-					for(ColumnInfo col : cols){
-						pstmt.setObject(1, versionId);
-						pstmt.setObject(2, table.getName());
-						pstmt.setObject(3, col.getName());
-						pstmt.setObject(4, col.getType());
-						pstmt.setObject(5, col.getSize());
-						pstmt.addBatch();
-					}
+				public void setValues(PreparedStatement pstmt, ColumnInfo column) throws SQLException {
+					pstmt.setObject(1, versionId);
+					pstmt.setObject(2, column.getName());
+					pstmt.setObject(3, column.getName());
+					pstmt.setObject(4, column.getType());
+					pstmt.setObject(5, column.getSize());
 				}
 		});
 	}

@@ -24,12 +24,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.domain.ColumnInfo;
-import com.domain.TableInfo;
 import com.service.CompareService;
 import com.util.DbUtil;
 import com.util.HttpUtil;
 import com.util.JsonUtil;
-import com.util.StringUtil;
 
 /**
  * 前端控制器
@@ -258,50 +256,14 @@ public class AppController {
 			// 获取相同的表名
 			List<Object> sameTables = DbUtil.queryOnes(buf.toString(), tarId,srcId);
 			// 获取有差异的表
-			Worker srcWorker = new Worker(srcId, sameTables, jdbcTemplate);
-			Worker tarWorker = new Worker(tarId, sameTables, jdbcTemplate);
-			Thread srcThread = new Thread(srcWorker);
-			Thread tarThread = new Thread(tarWorker);
-			srcThread.run();
-			tarThread.run();
-			srcThread.join();
-			tarThread.join();
-			
 			List<String> diffTables = new ArrayList<>();
-			List<TableInfo> srcTables = srcWorker.getTables();
-			List<TableInfo> tarTables = tarWorker.getTables();
 			for(int i=0;i<sameTables.size();i++){
-				TableInfo srcTable = srcTables.get(i);
-				TableInfo tarTable = tarTables.get(i);
-				if(!srcTable.equals(tarTable)){
-					diffTables.add(srcTable.getName());
+				String tableName = (String)sameTables.get(i);
+				if(!compareService.isSameTable(tableName, srcId, tarId)){
+					diffTables.add(tableName);
 				}
 			}
 			model.put("diffTables", diffTables);
-//			 获取差异的表
-//			buf.setLength(0);
-//			buf.append("SELECT DISTINCT TABLE_NAME FROM ((SELECT TABLE_NAME,COLUMN_NAME,COLUMN_TYPE,COLUMN_SIZE FROM DB_DETAIL WHERE VERSION_ID = ? ");
-//			if(!StringUtils.isEmpty(cond)){
-//				buf.append(" AND (").append(cond).append(") ");
-//			}
-//			buf.append(" MINUS ");
-//			buf.append("SELECT TABLE_NAME,COLUMN_NAME,COLUMN_TYPE,COLUMN_SIZE FROM DB_DETAIL WHERE VERSION_ID = ? ");
-//			if(!StringUtils.isEmpty(cond)){
-//				buf.append(" AND (").append(cond).append(") ");
-//			}
-//			buf.append(") UNION ")
-//			   .append("(SELECT TABLE_NAME,COLUMN_NAME,COLUMN_TYPE,COLUMN_SIZE FROM DB_DETAIL WHERE VERSION_ID = ? ");
-//			if(!StringUtils.isEmpty(cond)){
-//				buf.append(" AND (").append(cond).append(") ");
-//			}
-//			buf.append(" MINUS ")
-//			   .append("SELECT TABLE_NAME,COLUMN_NAME,COLUMN_TYPE,COLUMN_SIZE FROM DB_DETAIL WHERE VERSION_ID = ? ");
-//		    if(!StringUtils.isEmpty(cond)){
-//		    	buf.append(" AND (").append(cond).append(") ");
-//			} 
-//			buf.append(")) WHERE TABLE_NAME IN(SELECT DISTINCT TABLE_NAME FROM DB_DETAIL WHERE VERSION_ID = ? AND TABLE_NAME IN(")
-//			.append("SELECT DISTINCT TABLE_NAME FROM DB_DETAIL WHERE VERSION_ID = ?))");
-//			model.put("diffTables", DbUtil.queryOnes(buf.toString(), srcId, tarId,tarId,srcId, srcId, tarId));
 		}
 		return "compare/result";
 	}
@@ -373,58 +335,5 @@ public class AppController {
 		}
 		model.put("cols", map.values());
 		return "compare/table_diff";
-	}
-}
-
-class Worker implements Runnable {
-	private String versionId;
-	
-	private List<Object> tableNames;
-	
-	private JdbcTemplate jdbcTemplate;
-
-	private List<TableInfo> tables;
-	
-	public Worker(String versionId,List<Object> tableNames,JdbcTemplate jdbcTemplate) {
-		this.tableNames = tableNames;
-		this.jdbcTemplate = jdbcTemplate;
-		this.versionId = versionId;
-	}
-	
-	@Override
-	public void run() {
-		this.tables = jdbcTemplate.query("SELECT TABLE_NAME,COLUMN_NAME,COLUMN_TYPE,COLUMN_SIZE "
-				+ "FROM DB_DETAIL WHERE VERSION_ID = ? AND TABLE_NAME IN("
-				+ StringUtil.joinSql(tableNames) + ") ORDER BY TABLE_NAME", new Object[]{versionId},
-				new ResultSetExtractor<List<TableInfo>>(){
-				@Override
-				public List<TableInfo> extractData(ResultSet rs) throws SQLException, DataAccessException {
-					List<TableInfo> tables = new ArrayList<>();
-					TableInfo current = null;
-					while(rs.next()){
-						String tableName = rs.getString("TABLE_NAME");
-						String columnName = rs.getString("COLUMN_NAME");
-						String columnType = rs.getString("COLUMN_TYPE");
-						int columnSize = rs.getInt("COLUMN_SIZE");
-						if(current == null || !current.getName().equals(tableName)){
-							current = new TableInfo();
-							current.setName(tableName);
-							tables.add(current);
-						}
-						ColumnInfo ci = new ColumnInfo(columnName,columnType,columnSize);
-						List<ColumnInfo> cols = current.getColumns();
-						if(cols == null){
-							cols = new ArrayList<>();
-							current.setColumns(cols);
-						}
-						cols.add(ci);
-					}
-					return tables;
-				}
-		});
-	}
-	
-	public List<TableInfo> getTables(){
-		return this.tables;
 	}
 }
