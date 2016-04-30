@@ -33,7 +33,7 @@ public class MySqlDbCompartor implements IDbCompartor {
 		List<Object> params = new ArrayList<>();
 		buf.append("SELECT TABLE_NAME,COLUMN_NAME,DATA_TYPE AS COLUMN_TYPE, ")
 			 .append("CHARACTER_MAXIMUM_LENGTH AS COLUMN_SIZE ")
-			 .append("FROM COLUMNS WHERE TABLE_SCHEMA = ? ");
+			 .append("FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = ? ");
 		params.add(schema);
 		if(!StringUtils.isEmpty(namePattern)){
 			buf.append(" AND TABLE_NAME LIKE ? ");
