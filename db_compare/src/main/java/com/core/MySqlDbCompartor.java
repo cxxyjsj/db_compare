@@ -1,11 +1,15 @@
 package com.core;
 
 import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.stereotype.Service;
 
 import com.domain.ColumnInfo;
@@ -20,53 +24,56 @@ import com.util.DbUtil;
 @Service("comparator.mysql")
 public class MySqlDbCompartor implements IDbCompartor {
 	
+	private static transient Log log = LogFactory.getLog(MySqlDbCompartor.class);
+	
 	@Override
 	public List<TableInfo> getTables(Connection conn, String namePattern) throws Exception {
+		String schema = conn.getCatalog();
 		StringBuilder buf = new StringBuilder();
-		List<Object> params = new ArrayList<>(1);
-		buf.append("SELECT TABLE_NAME FROM USER_TABLES WHERE 1=1 ");
+		List<Object> params = new ArrayList<>();
+		buf.append("SELECT TABLE_NAME,COLUMN_NAME,DATA_TYPE AS COLUMN_TYPE, ")
+			 .append("CHARACTER_MAXIMUM_LENGTH AS COLUMN_SIZE ")
+			 .append("FROM COLUMNS WHERE TABLE_SCHEMA = ? ");
+		params.add(schema);
 		if(!StringUtils.isEmpty(namePattern)){
 			buf.append(" AND TABLE_NAME LIKE ? ");
-			params.add(namePattern + "%");
+			params.add(namePattern);
 		}
-		List<Map<String, Object>> tables = DbUtil.query(conn, buf.toString(), params.toArray());
-		if(tables == null || tables.size() < 1){
-			return null;
-		}
-		List<TableInfo> results = new ArrayList<>(tables.size());
-		for(Map<String, Object> table : tables){
-			TableInfo ti = new TableInfo();
-			String tableName = (String)table.get("TABLE_NAME");
-			ti.setName(tableName);
-			ti.setColumns(getColumns(conn, tableName));
-			results.add(ti);
-		}
-		return results;
-	}
-	
-	/**
-	 * 获取数据表列信息
-	 * @param conn
-	 * @param tableName
-	 * @return
-	 * @throws Exception
-	 */
-	private List<ColumnInfo> getColumns(Connection conn, String tableName)throws Exception {
-		List<Map<String, Object>> datas = DbUtil.query(conn, "SELECT COLUMN_NAME,DATA_TYPE ,DATA_LENGTH FROM USER_TAB_COLUMNS "
-				+ "WHERE TABLE_NAME = ?", tableName);
-		if(datas == null || datas.size() < 1){
-			return null;
-		}
-		List<ColumnInfo> results = new ArrayList<>(datas.size());
-		for(Map<String, Object> data : datas){
-			ColumnInfo ci = new ColumnInfo();
-			ci.setName((String)data.get("COLUMN_NAME"));
-			ci.setType((String)data.get("DATA_TYPE"));
-			Object size = data.get("DATA_LENGTH");
-			if(size != null){
-				ci.setSize(Integer.parseInt(size.toString()));
+		List<TableInfo> results = new ArrayList<>();
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
+		try {
+			pstmt = conn.prepareStatement(buf.toString());
+			for(int i=0;i<params.size();i++){
+				pstmt.setObject(i+1, params.get(i));
 			}
-			results.add(ci);
+			rs = pstmt.executeQuery();
+			TableInfo table = null;
+			while(rs.next()){
+				String tableName = rs.getString("TABLE_NAME");
+				String columnName = rs.getString("COLUMN_NAME");
+				String columnType = rs.getString("COLUMN_TYPE");
+				int columnSize = rs.getInt("COLUMN_SIZE");
+				if(table == null || !tableName.equals(table.getName())){
+					table = new TableInfo();
+					table.setName(tableName);
+					results.add(table);
+				}
+				ColumnInfo col = new ColumnInfo();
+				col.setName(columnName);
+				col.setType(columnType);
+				col.setSize(columnSize);
+				List<ColumnInfo> cols = table.getColumns();
+				if(cols == null){
+					cols = new ArrayList<>();
+					table.setColumns(cols);
+				}
+				cols.add(col);
+			}
+		} catch (Exception e) {
+			log.error(this,e);
+		}finally{
+			DbUtil.closeJdbc(null, new Statement[]{pstmt}, new ResultSet[]{rs});
 		}
 		return results;
 	}
