@@ -2,9 +2,9 @@ package com.service;
 
 import java.sql.Connection;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.bean.Worker;
 import com.core.IDbCompartor;
 import com.core.VersionProcessor;
 import com.util.DbUtil;
@@ -86,42 +87,48 @@ public class CompareService {
 	}
 	
 	/**
-	 * 判断是否相同的表结构
+	 * 获取表结构不同的表名
 	 * @author cxxyjsj
-	 * @date 2016年4月30日 下午5:05:18
-	 * @param tableName
-	 * @param version1
-	 * @param version2
+	 * @date 2016年5月1日 下午2:05:15
+	 * @param tableNames
 	 * @return
 	 * @throws Exception
 	 */
-	public boolean isSameTable(String tableName, String version1, String version2)throws Exception {
-		String sql = "SELECT COLUMN_NAME,COLUMN_TYPE,COLUMN_SIZE FROM DB_DETAIL WHERE "
-				+ "TABLE_NAME = ? AND VERSION_ID = ?";
-		List<Map<String, Object>> cols = DbUtil.query(sql, tableName, version1);
-		List<Map<String, Object>> cols2 = DbUtil.query(sql, tableName, version2);
-		if(cols == null || cols2 == null){
-			return false;
-		}
-		if(cols.size() != cols2.size()){
-			return false;
-		}
-		Map<String, Map<String,Object>> map = StringUtil.convertList(cols, "COLUMN_NAME");
-		Map<String, Map<String,Object>> map2 = StringUtil.convertList(cols2, "COLUMN_NAME");
-		for(Iterator<String> iter = map.keySet().iterator();iter.hasNext();){
-			String name = iter.next();
-			Map<String, Object> col = map.get(name);
-			if(!map2.containsKey(name)){
-				return false;
+	public List<String> getDiffTables(String srcId,String tarId,List<Object> tableNames)throws Exception {
+		int size = tableNames.size();
+		int count = size % 50 == 0 ? size / 50 : size / 50 + 1;
+		List<Worker> workerList = new ArrayList<>(count);
+		for(int i=0;i<count;i++){
+			List<Object> list = null;
+			if(i == count - 1){
+				list = tableNames.subList(50 * i, size);
+			}else{
+				list = tableNames.subList(50 * i, (i + 1) * 50);
 			}
-			Map<String, Object> col2 = map2.get(name);
-			if(!isSameColumn(col, col2)){
-				return false;
-			}
+			Worker worker = new Worker(srcId, tarId, list);
+			workerList.add(worker);
 		}
-		return true;
+		for(Worker worker : workerList){
+			worker.start();
+		}
+		for(Worker worker : workerList){
+			worker.join();
+		}
+		List<String> results = new ArrayList<>();
+		for(Worker worker : workerList){
+			results.addAll(worker.getDiffTables());
+		}
+		return results;
 	}
 	
+	/**
+	 * 是否为相同列
+	 * @author cxxyjsj
+	 * @date 2016年5月1日 下午5:47:48
+	 * @param col
+	 * @param col2
+	 * @return
+	 */
 	private boolean isSameColumn(Map<String, Object> col, Map<String, Object> col2) {
 		if(col == null || col2 == null){
 			return false;

@@ -26,7 +26,9 @@ import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 
+import com.domain.ColumnInfo;
 import com.domain.SqlWrapper;
+import com.domain.jdbc.DefaultColumnInfoResultSetExtractor;
 import com.domain.jdbc.DefaultColumnMapRowMapper;
 import com.domain.jdbc.DefaultMapResultSetExtractor;
 import com.domain.jdbc.DefaultSingleRowResultSetExtractor;
@@ -56,6 +58,8 @@ public class DbUtil {
 	public static final DefaultSingleValueResultSetExtractor defaultSingleValueResultSetExtractor = new DefaultSingleValueResultSetExtractor();
 	
 	public static final DefaultSingleValuesResultSetExtractor defaultSingleValuesResultSetExtractor = new DefaultSingleValuesResultSetExtractor();
+	
+	public static final DefaultColumnInfoResultSetExtractor defaultColumnInfoResultSetExtractor = new DefaultColumnInfoResultSetExtractor();
 	
 	public static final Properties DB_PROPS = new Properties();
 	
@@ -91,6 +95,10 @@ public class DbUtil {
 	 */
 	public static List<Map<String, Object>> query(String sql, Object... params) throws Exception {
 		return jdbcTemplate.query(sql, params, defaultColumnMapRowMapper);
+	}
+	
+	public static List<ColumnInfo> queryColumns(String sql, Object... params)throws Exception {
+		return jdbcTemplate.query(sql, params,defaultColumnInfoResultSetExtractor);
 	}
 
 	/**

@@ -1,7 +1,5 @@
 package com.web;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -14,9 +12,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -256,13 +252,7 @@ public class AppController {
 			// 获取相同的表名
 			List<Object> sameTables = DbUtil.queryOnes(buf.toString(), tarId,srcId);
 			// 获取有差异的表
-			List<String> diffTables = new ArrayList<>();
-			for(int i=0;i<sameTables.size();i++){
-				String tableName = (String)sameTables.get(i);
-				if(!compareService.isSameTable(tableName, srcId, tarId)){
-					diffTables.add(tableName);
-				}
-			}
+			List<String> diffTables = compareService.getDiffTables(srcId, tarId, sameTables);
 			model.put("diffTables", diffTables);
 		}
 		return "compare/result";
@@ -278,25 +268,11 @@ public class AppController {
 	@RequestMapping("/compare/diff/{srcId}_{tarId}/{tableName}")
 	public String compareTableDetail(ModelMap model,@PathVariable String tableName,@PathVariable String srcId,
 			@PathVariable String tarId)throws Exception {
-		String sql = "SELECT COLUMN_NAME AS NAME,COLUMN_TYPE AS TYPE,COLUMN_SIZE AS SIZE FROM DB_DETAIL WHERE VERSION_ID = ? AND TABLE_NAME = ?";
+		String sql = "SELECT TABLE_NAME,COLUMN_NAME,COLUMN_TYPE,COLUMN_SIZE FROM DB_DETAIL "
+				+ "WHERE VERSION_ID = ? AND TABLE_NAME = ?";
 		
-		ResultSetExtractor<List<ColumnInfo>> rse = new ResultSetExtractor<List<ColumnInfo>>() {
-			@Override
-			public List<ColumnInfo> extractData(ResultSet rs) throws SQLException, DataAccessException {
-				List<ColumnInfo> list = new ArrayList<>();
-				while(rs.next()){
-					ColumnInfo col = new ColumnInfo();
-					col.setName(rs.getString("NAME"));
-					col.setType(rs.getString("TYPE"));
-					col.setSize(rs.getInt("SIZE"));
-					list.add(col);
-				}
-				return list;
-			}
-		};
-		
-		List<ColumnInfo> srcCols = jdbcTemplate.query(sql, new Object[]{srcId,tableName},rse);
-		List<ColumnInfo> tarCols = jdbcTemplate.query(sql, new Object[]{tarId,tableName},rse);
+		List<ColumnInfo> srcCols = DbUtil.queryColumns(sql, srcId,tableName);
+		List<ColumnInfo> tarCols = DbUtil.queryColumns(sql, tarId,tableName);
 		
 		List<ColumnInfo> distCols = new ArrayList<>();
 		if(srcCols != null && srcCols.size() > 0){
