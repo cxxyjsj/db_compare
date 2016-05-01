@@ -34,7 +34,7 @@ import com.util.JsonUtil;
  * @author MX
  * @date 2016年3月18日 下午7:18:01
  */
-@Controller()
+@Controller
 @RequestMapping("/")
 public class AppController {
 	
