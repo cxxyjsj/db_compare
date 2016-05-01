@@ -33,7 +33,7 @@ public class VersionProcessor {
 				@Override
 				public void setValues(PreparedStatement pstmt, ColumnInfo column) throws SQLException {
 					pstmt.setObject(1, versionId);
-					pstmt.setObject(2, column.getName());
+					pstmt.setObject(2, column.getTableName());
 					pstmt.setObject(3, column.getName());
 					pstmt.setObject(4, column.getType());
 					pstmt.setObject(5, column.getSize());

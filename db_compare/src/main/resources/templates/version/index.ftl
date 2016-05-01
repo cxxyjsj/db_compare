@@ -22,7 +22,7 @@
       <td>${v.DB_NAME}</td>
       <td>${v.DESCR}</td>
       <td>${v.CREATE_DATE}</td>
-      <td>表:${v.TABLE_COUNT}条 | 列:${v.TOTAL_COUNT}条</td>
+      <td>表:${v.TABLE_COUNT} | 列:${v.TOTAL_COUNT}</td>
       <td>
       	<a href="javascript:;" class="btn btn-sm btn-primary" op="version_view">查看</a>
       	<a href="javascript:;" class="btn btn-sm btn-danger" op="version_del">删除</a>
