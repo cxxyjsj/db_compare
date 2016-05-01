@@ -50,4 +50,24 @@ public class MySqlDbCompartor extends AbstractDbCompartor {
 		}
 		return null;
 	}
+
+	@Override
+	public String getAddSql(ColumnInfo col) {
+		String sql = "ALTER TABLE " + col.getTableName() + " ADD COLUMN " 
+				+ col.getName() + " " + col.getType();
+		if(col.getSize() > 0){
+			sql += "(" + col.getSize() + ");";
+		}
+		return sql;
+	}
+
+	@Override
+	public String getModifySql(ColumnInfo col) {
+		String sql = "ALTER TABLE " + col.getTableName() + " CHANGE " 
+				+ col.getName() + " " + col.getType();
+		if(col.getSize() > 0){
+			sql += "(" + col.getSize() + ");";
+		}
+		return sql;
+	}
 }

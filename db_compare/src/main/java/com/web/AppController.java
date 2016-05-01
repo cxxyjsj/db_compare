@@ -1,5 +1,8 @@
 package com.web;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -12,7 +15,10 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -38,9 +44,6 @@ public class AppController {
 	
 	@Autowired
 	private CompareService compareService;
-	
-	@Autowired
-	private JdbcTemplate jdbcTemplate;
 	
 	/**
 	 * 进入首页
@@ -248,7 +251,7 @@ public class AppController {
 			if(!StringUtils.isEmpty(cond)){
 				buf.append(" AND (").append(cond).append(") ");
 			}
-			buf.append(") ORDER BY TABLE_NAME");
+			buf.append(")");
 			// 获取相同的表名
 			List<Object> sameTables = DbUtil.queryOnes(buf.toString(), tarId,srcId);
 			// 获取有差异的表
@@ -311,5 +314,53 @@ public class AppController {
 		}
 		model.put("cols", map.values());
 		return "compare/table_diff";
+	}
+	
+	/**
+	 * 导出变更脚本
+	 * @author cxxyjsj
+	 * @date 2016年5月1日 下午8:15:17
+	 * @param tableName
+	 * @param srcId
+	 * @param tarId
+	 * @return
+	 * @throws Exception
+	 */
+	@RequestMapping("/export/{srcId}_{tarId}")
+	public ResponseEntity<byte[]> exportChangeSql(@PathVariable String srcId,
+			@PathVariable String tarId)throws Exception {
+		StringBuilder buf = new StringBuilder();
+		buf.append("SELECT DISTINCT TABLE_NAME FROM DB_DETAIL WHERE VERSION_ID = ? ");
+		buf.append(" AND TABLE_NAME IN(")
+		   .append("SELECT DISTINCT TABLE_NAME FROM DB_DETAIL WHERE VERSION_ID = ? ");
+		buf.append(")");
+		// 获取相同的表名
+		List<Object> sameTables = DbUtil.queryOnes(buf.toString(), tarId,srcId);
+		// 获取有差异的表
+		List<String> diffTables = compareService.getDiffTables(srcId, tarId, sameTables);
+		if(diffTables == null || diffTables.size() < 1){
+			return null;
+		}
+		StringWriter sw = new StringWriter();
+		PrintWriter pw = new PrintWriter(sw);
+		// 获取两个版本中所有表结构变动. 只针对目标表进行新增和修改操作
+		String sql = "SELECT TABLE_NAME,COLUMN_NAME,COLUMN_TYPE,COLUMN_SIZE FROM DB_DETAIL "
+				+ "WHERE VERSION_ID = ? AND TABLE_NAME = ?";
+		String type = (String)DbUtil.queryOne("SELECT TYPE FROM DB WHERE ID = (SELECT DB_ID FROM"
+				+ " VERSION WHERE ID = ?)", tarId);
+		for(String tableName : diffTables){
+			List<ColumnInfo> srcCols = DbUtil.queryColumns(sql, srcId,tableName);
+			List<ColumnInfo> tarCols = DbUtil.queryColumns(sql, tarId,tableName);
+			String result = compareService.getChangeSql(type, tableName, srcCols, tarCols);
+			pw.println(result);
+		}
+		String results = sw.toString();
+		pw.close();
+		
+	 	HttpHeaders headers = new HttpHeaders();    
+        String fileName= "Database change.sql";
+        headers.setContentDispositionFormData("attachment", fileName);   
+        headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+        return new ResponseEntity<byte[]>(results.getBytes(Charset.forName("UTF-8")), headers, HttpStatus.CREATED);    
 	}
 }

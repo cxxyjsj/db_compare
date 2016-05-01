@@ -48,4 +48,26 @@ public class OracleDbCompartor extends AbstractDbCompartor {
 		}
 		return null;
 	}
+
+	@Override
+	public String getAddSql(ColumnInfo col) {
+		String sql = "ALTER TABLE " + col.getTableName() + " ADD (" 
+				+ col.getName() + " " + col.getType();
+		if(col.getSize() > 0){
+			sql += "(" + col.getSize() + ")";
+		}
+		sql += ");";
+		return sql;
+	}
+
+	@Override
+	public String getModifySql(ColumnInfo col) {
+		String sql = "ALTER TABLE " + col.getTableName() + " MODIFY (" 
+				+ col.getName() + " " + col.getType();
+		if(col.getSize() > 0){
+			sql += "(" + col.getSize() + ")";
+		}
+		sql += ");";
+		return sql;
+	}
 }

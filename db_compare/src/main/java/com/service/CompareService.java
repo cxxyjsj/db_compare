@@ -1,8 +1,12 @@
 package com.service;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.sql.Connection;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -17,9 +21,9 @@ import org.springframework.transaction.annotation.Transactional;
 import com.bean.Worker;
 import com.core.IDbCompartor;
 import com.core.VersionProcessor;
+import com.domain.ColumnInfo;
 import com.util.DbUtil;
 import com.util.SpringUtil;
-import com.util.StringUtil;
 
 /**
  * 比较服务
@@ -122,32 +126,65 @@ public class CompareService {
 	}
 	
 	/**
-	 * 是否为相同列
+	 * 获取变更的SQL脚本
 	 * @author cxxyjsj
-	 * @date 2016年5月1日 下午5:47:48
-	 * @param col
-	 * @param col2
+	 * @date 2016年5月1日 下午8:26:37
+	 * @param srcList
+	 * @param tarList
 	 * @return
 	 */
-	private boolean isSameColumn(Map<String, Object> col, Map<String, Object> col2) {
-		if(col == null || col2 == null){
-			return false;
+	public String getChangeSql(String type, String tableName, List<ColumnInfo> srcList, List<ColumnInfo> tarList)throws Exception {
+		IDbCompartor idc = (IDbCompartor)SpringUtil.getBean("comparator." + type);
+		if(idc == null){
+			throw new Exception("暂未支持的数据库类型:" + type);
 		}
-		String name = StringUtil.defaultValue(col.get("COLUMN_NAME"));
-		String name2 = StringUtil.defaultValue(col2.get("COLUMN_NAME"));
-		if(!name.equals(name2)){
-			return false;
+		StringWriter sw = new StringWriter();
+		PrintWriter pw = new PrintWriter(sw);
+		pw.println("/* Start " + tableName + " Change SQL. */");
+		
+		// 1. 新增的字段
+		List<ColumnInfo> srcList2 = new ArrayList<>(Arrays.asList(new ColumnInfo[srcList.size()]));
+		Collections.copy(srcList2, srcList);
+		srcList2.removeAll(tarList);
+		for(ColumnInfo col : srcList2){
+			if(col == null){
+				continue;
+			}
+			pw.println(idc.getAddSql(col));
 		}
-		String type = StringUtil.defaultValue(col.get("COLUMN_TYPE"));
-		String type2 = StringUtil.defaultValue(col2.get("COLUMN_TYPE"));
-		if(!type.equals(type2)){
-			return false;
+		pw.println();
+		
+		// 2. 更新的字段
+		Map<String, ColumnInfo> srcMap = convertMap(srcList);
+		for(ColumnInfo col : tarList){
+			ColumnInfo srcCol = srcMap.get(col.getName());
+			if(srcCol == null){
+				continue;
+			}
+			if(srcCol.equals(col)){
+				continue;
+			}
+			pw.println("/* " + srcCol.desc() + " --> " + col.desc() + " */");
+			pw.println(idc.getModifySql(srcCol));
 		}
-		String size = StringUtil.defaultValue(col.get("COLUMN_SIZE"));
-		String size2 = StringUtil.defaultValue(col2.get("COLUMN_SIZE"));
-		if(!size.equals(size2)){
-			return false;
+		pw.println();
+		String result = sw.toString();
+		pw.close();
+		return result;
+	}
+	
+	/**
+	 * 转换列信息
+	 * @author cxxyjsj
+	 * @date 2016年5月1日 下午8:44:37
+	 * @param cols
+	 * @return
+	 */
+	private Map<String, ColumnInfo> convertMap(List<ColumnInfo> cols) {
+		Map<String, ColumnInfo> map = new HashMap<>();
+		for(ColumnInfo col : cols){
+			map.put(col.getName(), col);
 		}
-		return true;
+		return map;
 	}
 }

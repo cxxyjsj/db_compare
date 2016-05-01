@@ -84,6 +84,10 @@ public class ColumnInfo {
 	public String toString() {
 		return "ColumnInfo [tableName=" + tableName + ",name=" + name + ", type=" + type + ", size=" + size + "]";
 	}
+	
+	public String desc() {
+		return "[" + name + " " + type + "(" + size + ")]";
+	}
 
 	@Override
 	public boolean equals(Object obj) {

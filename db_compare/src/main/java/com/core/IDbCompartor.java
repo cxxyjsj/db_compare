@@ -19,4 +19,22 @@ public interface IDbCompartor {
 	 * @throws Exception
 	 */
 	public List<ColumnInfo> getColumns(Connection conn,String namePattern)throws Exception;
+	
+	/**
+	 * 获取新增列SQL
+	 * @author cxxyjsj
+	 * @date 2016年5月1日 下午8:51:15
+	 * @param col
+	 * @return
+	 */
+	public String getAddSql(ColumnInfo col);
+	
+	/**
+	 * 获取更新列SQL
+	 * @author cxxyjsj
+	 * @date 2016年5月1日 下午8:51:30
+	 * @param col
+	 * @return
+	 */
+	public String getModifySql(ColumnInfo col);
 }

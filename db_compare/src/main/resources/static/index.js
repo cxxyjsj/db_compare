@@ -203,9 +203,12 @@ var compare = {
 		$("#compare_container").on("click","[op^='compare_']",function(){
 			var op = $(this).attr("op");
 			switch(op){
-			case 'compare_start' :
-				compare.start();
-				break;
+				case 'compare_start' :
+					compare.start();
+					break;
+				case 'compare_export' : 
+					compare.export();
+					break;
 			}
 		}).on("click","#diffTable tr",function(){
 			var tableName = $(this).find("td:eq(1)").text();
@@ -240,7 +243,21 @@ var compare = {
 			}
 		});
 	},
-	
+	export : function(){
+		// 导出SQL脚本
+		var $diffTable = $("#diffTable");
+		if($diffTable.size() < 1){
+			$.alert("请先比较数据库");
+			return;
+		}
+		var srcId = $diffTable.attr("srcId");
+		var tarId = $diffTable.attr("tarId");
+		if(!srcId || !tarId){
+			$.alert("必要参数丢失");
+			return;
+		}
+		window.open(basePath + "/export/" + srcId + "_" + tarId);
+	}
 }
 
 $(function(){
