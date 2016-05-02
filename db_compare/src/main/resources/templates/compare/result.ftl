@@ -1,7 +1,7 @@
 <div class="row">
 	<div class="col-md-4">
 		<div class="panel panel-default">
-		  <div class="panel-heading">主版本比目标版本多出的表名</div>
+		  <div class="panel-heading">主版本比目标版本多出的表</div>
 		  <div class="panel-body">
 		    <#if moreTables?size gt 0>
 		    <table class="table table-condensed">
@@ -26,7 +26,7 @@
 	</div>
 	<div class="col-md-4">
 		<div class="panel panel-default">
-		  <div class="panel-heading">主版本比目标版本缺少的表名</div>
+		  <div class="panel-heading">主版本比目标版本缺少的表</div>
 		  <div class="panel-body">
 		    <#if lessTables?size gt 0>
 		    <table class="table table-condensed">
@@ -51,7 +51,12 @@
 	</div>
 	<div class="col-md-4">
 		<div class="panel panel-default">
-		  <div class="panel-heading">主版本比目标版本差异的表名</div>
+		  <div class="panel-heading">
+		  	差异的表
+		  	<div class="pull-right">
+		  		<a href="javascript:;" class="btn btn-info" op="compare_export" style="position:absolute;right:20px;top:4px;">导出变更脚本</a>
+		  	</div>
+		  </div>
 		  <div class="panel-body">
 		    <#if diffTables?size gt 0>
 		    <table class="table table-condensed" id="diffTable" srcId="${srcId}" tarId="${tarId}">

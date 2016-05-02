@@ -1,7 +1,6 @@
 <div id="compare_container">
 <div class="btn-tools">
 	<a href="javascript:;" class="btn btn-primary" op="compare_start">开始比较</a>
-	<a href="javascript:;" class="btn btn-info" op="compare_export">导出变更脚本</a>
 </div>
 <div id="result">
 
