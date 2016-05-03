@@ -24,14 +24,15 @@ public class OracleDbCompartor extends AbstractDbCompartor {
 	@Override
 	public List<ColumnInfo> getColumns(Connection conn, String namePattern) throws Exception {
 		StringBuilder buf = new StringBuilder();
-		buf.append("SELECT TABLE_NAME,COLUMN_NAME,DATA_TYPE AS COLUMN_TYPE,DATA_LENGTH ")
-			 .append(" AS COLUMN_SIZE FROM USER_TAB_COLUMNS WHERE 1=1 ");
+		buf.append("SELECT B.TABLE_NAME,B.COLUMN_NAME,B.DATA_TYPE AS COLUMN_TYPE,B.DATA_LENGTH ")
+			 .append(" AS COLUMN_SIZE FROM USER_TABLES A LEFT JOIN USER_TAB_COLUMNS B ON A.TABLE_NAME ")
+			 .append(" = B.TABLE_NAME WHERE 1=1 ");
 		List<Object> params = new ArrayList<>();
 		if(!StringUtils.isEmpty(namePattern)){
-			buf.append(" AND TABLE_NAME LIKE ? ");
+			buf.append(" AND A.TABLE_NAME LIKE ? ");
 			params.add(namePattern);
 		}
-		buf.append(" ORDER BY TABLE_NAME");
+		buf.append(" ORDER BY B.TABLE_NAME,B.COLUMN_ID");
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
 		try {
@@ -39,6 +40,26 @@ public class OracleDbCompartor extends AbstractDbCompartor {
 			for(int i=0;i<params.size();i++){
 				pstmt.setObject(i+1, params.get(i));
 			}
+			rs = pstmt.executeQuery();
+			return extractColumns(rs);
+		} catch (Exception e) {
+			log.error(this,e);
+		}finally {
+			DbUtil.closeJdbc(null, new Statement[]{pstmt}, new ResultSet[]{rs});
+		}
+		return null;
+	}
+	
+	@Override
+	public List<ColumnInfo> getViews(Connection conn) throws Exception {
+		StringBuilder buf = new StringBuilder();
+		buf.append("SELECT B.TABLE_NAME,B.COLUMN_NAME,B.DATA_TYPE AS COLUMN_TYPE,B.DATA_LENGTH ")
+			 .append(" AS COLUMN_SIZE FROM USER_VIEWS A LEFT JOIN USER_TAB_COLUMNS B ON A.VIEW_NAME ")
+			 .append(" = B.TABLE_NAME ORDER BY B.TABLE_NAME,B.COLUMN_ID");
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
+		try {
+			pstmt = conn.prepareStatement(buf.toString());
 			rs = pstmt.executeQuery();
 			return extractColumns(rs);
 		} catch (Exception e) {

@@ -21,6 +21,16 @@ public interface IDbCompartor {
 	public List<ColumnInfo> getColumns(Connection conn,String namePattern)throws Exception;
 	
 	/**
+	 * 获取视图
+	 * @author cxxyjsj
+	 * @date 2016年5月3日 上午8:32:21
+	 * @param conn
+	 * @return
+	 * @throws Exception
+	 */
+	public List<ColumnInfo> getViews(Connection conn)throws Exception;
+	
+	/**
 	 * 获取新增列SQL
 	 * @author cxxyjsj
 	 * @date 2016年5月1日 下午8:51:15

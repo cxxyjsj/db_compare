@@ -50,6 +50,12 @@ public class MySqlDbCompartor extends AbstractDbCompartor {
 		}
 		return null;
 	}
+	
+	@Override
+	public List<ColumnInfo> getViews(Connection conn) throws Exception {
+		// TODO Auto-generated method stub
+		return null;
+	}
 
 	@Override
 	public String getAddSql(ColumnInfo col) {
