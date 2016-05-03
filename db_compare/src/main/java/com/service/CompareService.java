@@ -9,6 +9,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -140,16 +141,18 @@ public class CompareService {
 		}
 		StringWriter sw = new StringWriter();
 		PrintWriter pw = new PrintWriter(sw);
-		pw.println("/* Start " + tableName + " Change SQL. */");
+		pw.println("/* ---------- " + tableName + " ---------- */");
 		
 		// 1. 新增的字段
 		List<ColumnInfo> srcList2 = new ArrayList<>(Arrays.asList(new ColumnInfo[srcList.size()]));
 		Collections.copy(srcList2, srcList);
-		srcList2.removeAll(tarList);
-		for(ColumnInfo col : srcList2){
-			if(col == null){
-				continue;
-			}
+		Map<String, ColumnInfo> src2Map = convertMap(srcList2);
+		for(ColumnInfo col : tarList){
+			src2Map.remove(col.getName());
+		}
+		for(Iterator<String> iter = src2Map.keySet().iterator();iter.hasNext();){
+			String key = iter.next();
+			ColumnInfo col = src2Map.get(key);
 			pw.println(idc.getAddSql(col));
 		}
 		pw.println();
@@ -164,7 +167,6 @@ public class CompareService {
 			if(srcCol.equals(col)){
 				continue;
 			}
-			pw.println("/* " + srcCol.desc() + " --> " + col.desc() + " */");
 			pw.println(idc.getModifySql(srcCol));
 		}
 		pw.println();
