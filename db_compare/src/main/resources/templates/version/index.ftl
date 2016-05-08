@@ -71,9 +71,8 @@
 	        <label>版本说明</label>
 	        <textarea class="form-control" name="DESCR"></textarea>
 	    </div>
-	    <div class="form-group">
+	    <div class="form-group" id="fileArea">
 	    	<label>选择文件</label>
-	    	<input type="file" id="file" name="file">
 	    </div>
     </form>
 </div>

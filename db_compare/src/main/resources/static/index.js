@@ -166,31 +166,45 @@ var version = {
 			title : '新增数据库版本',
 			content : $("#import_template").html(),
 			beforeShow : function(){
-				this.find("form").validationEngine();
-				$("#file",this).uploadify({
+				var $dialog = this;
+				var $file = $("<input type='file' name='file' id='file'>");
+				$dialog.find("#fileArea").append($file);
+				$file.uploadify({
+					auto          : false,
+					multi         : false,
+					uploadLimit   : 1,
+					fileTypeExts  : "*.txt;*.csv",
+					fileTypeDesc  : "文本文件",
 					height        : 30,
+					buttonText    : '选择文件',
+					fileObjName   : 'file',
 					swf           : '/uploadify/uploadify.swf',
-					uploader      : '/uploadify/uploadify.php',
-					width         : 120
+					uploader      : basePath + '/version/upload',
+					width         : 120,
+					onUploadStart : function(file){
+						var data = {
+							'DB_ID' : $dialog.find("[name='DB_ID']").val(),
+							'DESCR' : $dialog.find("[name='DESCR']").val()
+						}
+						$file.uploadify("settings", "formData", data);
+					},
+					onUploadSuccess : function(){
+						$.msg("上传成功",function(){
+							location.reload();
+						});
+					}
 				});
 			},
 			callback : function(op){
 				if(op == "ok"){
-					var $form = this.find("form");
-					if(!$form.validationEngine("validate")){
+					var $file = this.find("#file");
+					var $uploadify = $file.data("uploadify");
+					if($uploadify.queueData.filesQueued < 1){
+						$.alert("请选择文件");
 						return false;
 					}
 					$("body").showLoading();
-					$.post(basePath + "/version/add",$form.serialize(),function(resp){
-						$("body").hideLoading();
-						if(resp.success){
-							$.msg("创建成功",function(){
-								location.reload();
-							});
-						}else{
-							$.alert(resp.msg || "创建失败");
-						}
-					});
+					this.find("#file").uploadify("upload");
 					return false;
 				}
 			}

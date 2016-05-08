@@ -23,7 +23,9 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.domain.ColumnInfo;
 import com.service.CompareService;
@@ -191,6 +193,21 @@ public class AppController {
 	public @ResponseBody Object versionDel(@PathVariable String id)throws Exception {
 		compareService.deleteVersion(id);
 		return Collections.singletonMap("success", true);
+	}
+	
+	/**
+	 * 上传版本文件
+	 * @author cxxyjsj
+	 * @date 2016年5月8日 上午9:17:08
+	 * @param file
+	 * @return
+	 * @throws Exception
+	 */
+	@RequestMapping("/version/upload")
+	public @ResponseBody Map<String, Object> upload(@RequestParam("file") MultipartFile file,
+			@RequestParam String DB_ID)throws Exception {
+		
+		return null;
 	}
 	
 	/**
