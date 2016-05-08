@@ -179,6 +179,8 @@ var version = {
 			   if(!text){
 				   // 显示所有节点
 				   $tree.jstree("show_all");
+				   var tmps = $tree.jstree("get_text","_ROOT").split("(");
+				   $tree.jstree("set_text","_ROOT",tmps[0]);
 			   }else{
 				   // 显示匹配的节点
 				   var data = $tree.data("jstree")._model.data;
