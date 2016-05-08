@@ -163,7 +163,7 @@ var version = {
 	},
 	import : function(){
 		$.dialog({
-			title : '新增数据库版本',
+			title : '导入数据库版本',
 			content : $("#import_template").html(),
 			beforeShow : function(){
 				var $dialog = this;

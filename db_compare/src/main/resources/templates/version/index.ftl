@@ -75,6 +75,10 @@
 	    	<label>选择文件</label>
 	    </div>
     </form>
+    <div class="alert alert-success" role="alert">
+    <strong>文件内容格式:</strong><br/>
+      	每行格式: 表名,列名,列类型,列大小
+    </div>
 </div>
 <script>
 	version.init();

@@ -1,5 +1,6 @@
 package com.web;
 
+import java.io.InputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.nio.charset.Charset;
@@ -205,9 +206,14 @@ public class AppController {
 	 */
 	@RequestMapping("/version/upload")
 	public @ResponseBody Map<String, Object> upload(@RequestParam("file") MultipartFile file,
-			@RequestParam String DB_ID)throws Exception {
-		
-		return null;
+			@RequestParam String DB_ID,HttpServletRequest request)throws Exception {
+		String descr = request.getParameter("DESCR");
+		InputStream is = file.getInputStream();
+		compareService.handleUpload(is, DB_ID, descr);
+		is.close();
+		Map<String, Object> result = new HashMap<>();
+		result.put("success", true);
+		return result;
 	}
 	
 	/**

@@ -1,8 +1,14 @@
 package com.service;
 
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.nio.charset.Charset;
 import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -16,6 +22,8 @@ import java.util.Map;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.ParameterizedPreparedStatementSetter;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -36,6 +44,9 @@ public class CompareService {
 	
 	@Autowired
 	private VersionProcessor processor;
+	
+	@Autowired
+	private JdbcTemplate jdbcTemplate;
 	
 	private static transient Log log = LogFactory.getLog(CompareService.class);
 	
@@ -188,5 +199,60 @@ public class CompareService {
 			map.put(col.getName(), col);
 		}
 		return map;
+	}
+	
+	/**
+	 * 处理上传的文件
+	 * @author cxxyjsj
+	 * @date 2016年5月8日 上午11:10:14
+	 * @param is
+	 * @param dbId
+	 * @param descr
+	 * @throws Exception
+	 */
+	public void handleUpload(InputStream is, String dbId, String descr)throws Exception {
+		// 1. 生成版本ID
+		String date = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
+		descr = descr == null ? "" : descr;
+		DbUtil.execute("INSERT INTO VERSION(DB_ID,DESCR,CREATE_DATE) VALUES (?,?,?)", dbId,descr,date);
+		String versionId = String.valueOf(DbUtil.queryOne("SELECT ID FROM VERSION WHERE DB_ID = ? AND DESCR = ? AND CREATE_DATE = ?",
+				dbId, descr, date));
+		BufferedReader br = new BufferedReader(new InputStreamReader(is, Charset.forName("UTF-8")));
+		String line = null;
+		List<ColumnInfo> list = new ArrayList<>(1000);
+		String sql = "INSERT INTO DB_DETAIL(VERSION_ID,TABLE_NAME,COLUMN_NAME,COLUMN_TYPE,COLUMN_SIZE) VALUES (?,?,?,?,?)";
+		ParameterizedPreparedStatementSetter<ColumnInfo> setter = 
+				new ParameterizedPreparedStatementSetter<ColumnInfo>() {
+			@Override
+			public void setValues(PreparedStatement pstmt, ColumnInfo column) throws SQLException {
+				pstmt.setObject(1, versionId);
+				pstmt.setObject(2, column.getTableName());
+				pstmt.setObject(3, column.getName());
+				pstmt.setObject(4, column.getType());
+				pstmt.setObject(5, column.getSize());
+			}
+		};
+		// 表名,列名,类型,大小
+		while((line = br.readLine()) != null){
+			String[] tmps = line.trim().split(",");
+			if(tmps.length < 4){
+				continue;
+			}
+			ColumnInfo col = new ColumnInfo();
+			col.setTableName(tmps[0].trim());
+			col.setName(tmps[1].trim());
+			col.setType(tmps[2].trim());
+			try{
+				col.setSize(Integer.parseInt(tmps[3]));
+			}catch(Exception e){}
+			list.add(col);
+			if(list.size() >= 1000){
+				jdbcTemplate.batchUpdate(sql, list, 100, setter);
+				list.clear();
+			}
+		}
+		if(list.size() > 0){
+			jdbcTemplate.batchUpdate(sql, list, 100, setter);
+		}
 	}
 }
