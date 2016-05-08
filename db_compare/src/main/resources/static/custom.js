@@ -226,6 +226,9 @@ $.extend({
 			if(hash && hash.charAt(0) == "#"){
 				hash = hash.substr(1);
 			}
+			if(hash.charAt(0) == "/"){
+				hash = hash.substr(1);
+			}
 			$.post(basePath + "/" + hash,function(html){
 				$target.html(html);
 				if(callback){

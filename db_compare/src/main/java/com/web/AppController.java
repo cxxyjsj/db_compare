@@ -163,6 +163,76 @@ public class AppController {
 	}
 	
 	/**
+	 * 查看版本信息
+	 * @author cxxyjsj
+	 * @date 2016年5月8日 下午12:08:35
+	 * @param vId
+	 * @return
+	 * @throws Exception
+	 */
+	@RequestMapping("/version/view/{vId}")
+	public String versionView(ModelMap model, @PathVariable String vId)throws Exception {
+		model.put("version", DbUtil.queryRow("SELECT A.ID,B.NAME,A.CREATE_DATE FROM VERSION A LEFT JOIN DB B ON A.DB_ID = B.ID WHERE A.ID = ?", vId));
+		return "version/view";
+	}
+	
+	/**
+	 * 查询版本表列信息
+	 * @author cxxyjsj
+	 * @date 2016年5月8日 下午3:09:05
+	 * @param vId
+	 * @param tableName
+	 * @throws Exception
+	 */
+	@RequestMapping("/version/view/{vId}/tree")
+	public @ResponseBody Object viewVersionTree(@PathVariable String vId, @RequestParam String id)throws Exception {
+		List<Map<String, Object>> datas = new ArrayList<>();
+		Map<String,Object> version = DbUtil.queryRow("SELECT B.NAME,A.CREATE_DATE FROM VERSION A LEFT "
+				+ "JOIN DB B ON A.DB_ID = B.ID WHERE A.ID = ?", vId);
+		if("#".equals(id)){
+			// 根节点
+			Map<String, Object> root = new HashMap<>();
+			root.put("id", "_ROOT");
+			root.put("text", version.get("NAME"));
+			root.put("icon", "fa fa-desktop");
+			root.put("state",Collections.singletonMap("opened", true));
+			datas.add(root);
+			
+			List<Object> tableNames = DbUtil.queryOnes("SELECT DISTINCT TABLE_NAME FROM DB_DETAIL WHERE VERSION_ID = ? ORDER BY TABLE_NAME", vId);
+			List<Map<String, Object>> children = new ArrayList<>(tableNames.size());
+			root.put("children", children);
+			
+			for(Object tableName : tableNames){
+				Map<String, Object> node = new HashMap<>();
+				node.put("id", tableName);
+				node.put("text", tableName);
+				node.put("icon", "fa fa-list-alt");
+				node.put("state", Collections.singletonMap("opened", false));
+				node.put("children", true);
+				children.add(node);
+			}
+		}else{
+			// 查询列信息
+			List<Map<String, Object>> cols = DbUtil.query("SELECT COLUMN_NAME,COLUMN_TYPE,COLUMN_SIZE FROM "
+					+ "DB_DETAIL WHERE VERSION_ID = ? AND TABLE_NAME = ? ORDER BY ID", vId, id);
+			for(Map<String, Object> col : cols){
+				Map<String, Object> node = new HashMap<>();
+				String name = (String)col.get("COLUMN_NAME");
+				String type = (String)col.get("COLUMN_TYPE");
+				int size = col.containsKey("COLUMN_SIZE") ? Integer.valueOf(col.get("COLUMN_SIZE").toString()) : 0;
+				node.put("id", id + "_" + name);
+				node.put("parent", id);
+				node.put("icon", "fa fa-file-o");
+				node.put("text", name + " " + type + " (" + size + ")");
+				node.put("state", Collections.singletonMap("opened", true));
+				datas.add(node);
+			}
+		}
+		
+		return datas;
+	}
+	
+	/**
 	 * 添加数据库版本
 	 * @author MX
 	 * @date 2016年3月19日 下午6:48:09

@@ -161,6 +161,47 @@ var version = {
 	view : function(id){
 		location.href = "#" + basePath + "/version/view/" + id;
 	},
+	viewInit : function(){
+		var vId = $("#version_view").attr("mid");
+		$('#tree').jstree({
+			core : {
+				data : function(node,cb){
+					$.post(basePath + "/version/view/" + vId + "/tree",{id : node.id},function(resp){
+						cb(resp);
+					});
+				}
+			}
+		});
+		$("#txtSearch").keydown(function(e){
+			if(e.keyCode==13){
+			   var $tree = $("#tree");
+			   var text = $(this).val();
+			   if(!text){
+				   // 显示所有节点
+				   $tree.jstree("show_all");
+			   }else{
+				   // 显示匹配的节点
+				   var data = $tree.data("jstree")._model.data;
+				   text = text.toLowerCase();
+				   var cnt = 0;
+				   for(var name in data){
+					   if(name == "#" || name == "_ROOT"){
+						   continue;
+					   }
+					   if(name.toLowerCase().indexOf(text) >= 0){
+						   $tree.jstree("show_node",name,true);
+						   cnt++;
+					   }else{
+						   $tree.jstree("hide_node",name,true);
+					   }
+				   }
+				   var tmps = $tree.jstree("get_text","_ROOT").split("(");
+				   $tree.jstree("set_text","_ROOT",tmps[0] + "(" + cnt + ")");
+				   $tree.jstree("redraw",true);
+			   }
+			}
+		});
+	},
 	import : function(){
 		$.dialog({
 			title : '导入数据库版本',
