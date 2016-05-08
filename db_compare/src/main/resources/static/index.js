@@ -318,5 +318,7 @@ var compare = {
 }
 
 $(function(){
-	$.initRouter($("#page-wrapper"));
+	$.initRouter($("#page-wrapper"),function(){
+		this.append('<div style="clear:both;"></div>');
+	});
 });
