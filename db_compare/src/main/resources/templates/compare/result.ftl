@@ -1,3 +1,7 @@
+<div class="alert alert-success" role="alert">
+  <strong>主版本: ${srcDb.NAME}(${srcDb.CODE})</strong><br />
+  <strong>目标版本: ${tarDb.NAME}(${tarDb.CODE})</strong>
+</div>
 <div class="row">
 	<div class="col-md-4">
 		<div class="panel panel-default">

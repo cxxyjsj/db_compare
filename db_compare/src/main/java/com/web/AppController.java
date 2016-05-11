@@ -317,6 +317,8 @@ public class AppController {
 		if(!StringUtils.isEmpty(srcId) && !StringUtils.isEmpty(tarId)){
 			model.put("srcId", srcId);
 			model.put("tarId", tarId);
+			model.put("srcDb", DbUtil.queryRow("SELECT CODE,NAME FROM DB WHERE ID = (SELECT DB_ID FROM VERSION WHERE ID = ?)", srcId));
+			model.put("tarDb", DbUtil.queryRow("SELECT CODE,NAME FROM DB WHERE ID = (SELECT DB_ID FROM VERSION WHERE ID = ?)", tarId));
 			// 获取开发环境比现场环境多的表
 			StringBuilder buf = new StringBuilder();
 			buf.append("SELECT DISTINCT TABLE_NAME FROM DB_DETAIL WHERE VERSION_ID = ? ");

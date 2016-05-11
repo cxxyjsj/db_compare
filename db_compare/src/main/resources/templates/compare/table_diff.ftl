@@ -1,8 +1,8 @@
 <table class="table table-bordered" id="dbTable">
   <thead>
     <tr>
-      <th>主表</th>
-      <th>从表</th>
+      <th>主版本</th>
+      <th>目标版本</th>
     </tr>
   </thead>
   <tbody>
