@@ -18,7 +18,7 @@ public class DefaultColumnInfoResultSetExtractor implements ResultSetExtractor<L
 
 	@Override
 	public List<ColumnInfo> extractData(ResultSet rs) throws SQLException, DataAccessException {
-		List<ColumnInfo> list = new ArrayList<>();
+		List<ColumnInfo> list = new ArrayList<ColumnInfo>();
 		while(rs.next()){
 			ColumnInfo ci = new ColumnInfo();
 			ci.setTableName(rs.getString("TABLE_NAME"));

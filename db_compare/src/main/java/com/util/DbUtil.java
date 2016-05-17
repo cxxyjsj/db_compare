@@ -233,13 +233,13 @@ public class DbUtil {
 			}
 			rs = pstmt.executeQuery();
 			ResultSetMetaData rsmd = rs.getMetaData();
-			List<String> names = new ArrayList<>();
+			List<String> names = new ArrayList<String>();
 			for (int i = 0; i < rsmd.getColumnCount(); i++) {
 				names.add(rsmd.getColumnLabel(i + 1).toUpperCase());
 			}
-			List<Map<String, Object>> results = new ArrayList<>();
+			List<Map<String, Object>> results = new ArrayList<Map<String, Object>>();
 			while (rs.next()) {
-				Map<String, Object> data = new LinkedHashMap<>();
+				Map<String, Object> data = new LinkedHashMap<String, Object>();
 				for (String name : names) {
 					data.put(name, rs.getObject(name));
 				}

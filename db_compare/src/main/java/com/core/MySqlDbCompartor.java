@@ -27,7 +27,7 @@ public class MySqlDbCompartor extends AbstractDbCompartor {
 		buf.append("SELECT TABLE_NAME,COLUMN_NAME,DATA_TYPE AS COLUMN_TYPE, ")
 			 .append("CHARACTER_MAXIMUM_LENGTH AS COLUMN_SIZE ")
 			 .append("FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = ? ");
-		List<Object> params = new ArrayList<>();
+		List<Object> params = new ArrayList<Object>();
 		params.add(conn.getCatalog());
 		if(!StringUtils.isEmpty(namePattern)){
 			buf.append(" AND TABLE_NAME LIKE ? ");

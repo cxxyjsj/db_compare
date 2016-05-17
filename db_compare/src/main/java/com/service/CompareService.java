@@ -75,7 +75,7 @@ public class CompareService {
 			if(idc == null){
 				throw new Exception("暂未支持的数据库类型:" + type);
 			}
-			Map<String, Object> data = new HashMap<>();
+			Map<String, Object> data = new HashMap<String, Object>();
 			data.put("DB_ID", dbid);
 			data.put("DESCR", descr);
 			String createDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
@@ -113,7 +113,7 @@ public class CompareService {
 	public List<String> getDiffTables(String srcId,String tarId,List<Object> tableNames)throws Exception {
 		int size = tableNames.size();
 		int count = size % 50 == 0 ? size / 50 : size / 50 + 1;
-		List<Worker> workerList = new ArrayList<>(count);
+		List<Worker> workerList = new ArrayList<Worker>(count);
 		for(int i=0;i<count;i++){
 			List<Object> list = null;
 			if(i == count - 1){
@@ -130,7 +130,7 @@ public class CompareService {
 		for(Worker worker : workerList){
 			worker.join();
 		}
-		List<String> results = new ArrayList<>();
+		List<String> results = new ArrayList<String>();
 		for(Worker worker : workerList){
 			results.addAll(worker.getDiffTables());
 		}
@@ -155,7 +155,7 @@ public class CompareService {
 		pw.println("/* ---------- " + tableName + " ---------- */");
 		
 		// 1. 新增的字段
-		List<ColumnInfo> srcList2 = new ArrayList<>(Arrays.asList(new ColumnInfo[srcList.size()]));
+		List<ColumnInfo> srcList2 = new ArrayList<ColumnInfo>(Arrays.asList(new ColumnInfo[srcList.size()]));
 		Collections.copy(srcList2, srcList);
 		Map<String, ColumnInfo> src2Map = convertMap(srcList2);
 		for(ColumnInfo col : tarList){
@@ -194,7 +194,7 @@ public class CompareService {
 	 * @return
 	 */
 	private Map<String, ColumnInfo> convertMap(List<ColumnInfo> cols) {
-		Map<String, ColumnInfo> map = new HashMap<>();
+		Map<String, ColumnInfo> map = new HashMap<String, ColumnInfo>();
 		for(ColumnInfo col : cols){
 			map.put(col.getName(), col);
 		}
@@ -215,11 +215,11 @@ public class CompareService {
 		String date = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
 		descr = descr == null ? "" : descr;
 		DbUtil.execute("INSERT INTO VERSION(DB_ID,DESCR,CREATE_DATE) VALUES (?,?,?)", dbId,descr,date);
-		String versionId = String.valueOf(DbUtil.queryOne("SELECT ID FROM VERSION WHERE DB_ID = ? AND DESCR = ? AND CREATE_DATE = ?",
+		final String versionId = String.valueOf(DbUtil.queryOne("SELECT ID FROM VERSION WHERE DB_ID = ? AND DESCR = ? AND CREATE_DATE = ?",
 				dbId, descr, date));
 		BufferedReader br = new BufferedReader(new InputStreamReader(is, Charset.forName("UTF-8")));
 		String line = null;
-		List<ColumnInfo> list = new ArrayList<>(1000);
+		List<ColumnInfo> list = new ArrayList<ColumnInfo>(1000);
 		String sql = "INSERT INTO DB_DETAIL(VERSION_ID,TABLE_NAME,COLUMN_NAME,COLUMN_TYPE,COLUMN_SIZE) VALUES (?,?,?,?,?)";
 		ParameterizedPreparedStatementSetter<ColumnInfo> setter = 
 				new ParameterizedPreparedStatementSetter<ColumnInfo>() {

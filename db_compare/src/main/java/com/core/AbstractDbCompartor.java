@@ -18,7 +18,7 @@ public abstract class AbstractDbCompartor implements IDbCompartor {
 	protected static transient Log log = LogFactory.getLog(AbstractDbCompartor.class);
 
 	protected List<ColumnInfo> extractColumns(ResultSet rs) throws Exception {
-		List<ColumnInfo> results = new ArrayList<>();
+		List<ColumnInfo> results = new ArrayList<ColumnInfo>();
 		try {
 			while(rs.next()){
 				String tableName = rs.getString("TABLE_NAME");

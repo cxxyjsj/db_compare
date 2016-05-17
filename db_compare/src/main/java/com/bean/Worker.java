@@ -21,7 +21,7 @@ public class Worker extends Thread {
 	
 	private String tarId;
 	
-	private List<String> diffTables = new ArrayList<>();
+	private List<String> diffTables = new ArrayList<String>();
 	
 	public List<String> getDiffTables() {
 		return diffTables;
@@ -41,7 +41,7 @@ public class Worker extends Thread {
 					+ StringUtil.joinSql(tableNames) + ")";
 			List<ColumnInfo> srcList = DbUtil.queryColumns(sql ,  srcId);
 			List<ColumnInfo> tarList = DbUtil.queryColumns(sql ,  tarId);
-			List<ColumnInfo> srcList2 = new ArrayList<>(Arrays.asList(new ColumnInfo[srcList.size()]));
+			List<ColumnInfo> srcList2 = new ArrayList<ColumnInfo>(Arrays.asList(new ColumnInfo[srcList.size()]));
 			Collections.copy(srcList2, srcList);
 			srcList.removeAll(tarList);
 			for(ColumnInfo col : srcList){

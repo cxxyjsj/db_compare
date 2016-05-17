@@ -21,7 +21,7 @@ public class StringUtil {
 	}
 	
 	public static Map<String, Map<String,Object>> convertList(List<Map<String, Object>> datas, String key) {
-		Map<String, Map<String,Object>> results = new HashMap<>();
+		Map<String, Map<String,Object>> results = new HashMap<String, Map<String,Object>>();
 		for(Map<String, Object> data : datas){
 			String name = (String)data.get(key);
 			results.put(name, data);

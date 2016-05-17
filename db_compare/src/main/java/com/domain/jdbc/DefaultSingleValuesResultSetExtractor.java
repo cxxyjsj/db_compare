@@ -12,7 +12,7 @@ public class DefaultSingleValuesResultSetExtractor implements ResultSetExtractor
 
 	@Override
 	public List<Object> extractData(ResultSet rs) throws SQLException, DataAccessException {
-		List<Object> list = new ArrayList<>();
+		List<Object> list = new ArrayList<Object>();
 		while(rs.next()){
 			list.add(rs.getObject(1));
 		}

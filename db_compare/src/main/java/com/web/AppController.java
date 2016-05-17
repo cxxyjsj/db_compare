@@ -107,7 +107,7 @@ public class AppController {
 	 */
 	@RequestMapping("/db/del/{id}")
 	public @ResponseBody Object dbDel(@PathVariable String id)throws Exception {
-		Map<String, Object> model = new HashMap<>();
+		Map<String, Object> model = new HashMap<String, Object>();
 		DbUtil.execute("DELETE FROM DB WHERE ID = ?", id);
 		model.put("success", true);
 		return model;
@@ -123,7 +123,7 @@ public class AppController {
 	 */
 	@RequestMapping("/db/save")
 	public @ResponseBody Object dbSave()throws Exception {
-		Map<String, Object> model = new HashMap<>();
+		Map<String, Object> model = new HashMap<String, Object>();
 		Map<String, Object> data = HttpUtil.getParameterMap();
 		DbUtil.saveOrUpdate("DB", data);
 		model.put("success", true);
@@ -132,7 +132,7 @@ public class AppController {
 	
 	@RequestMapping("/db/test/{id}")
 	public @ResponseBody Object dbTest(@PathVariable String id)throws Exception {
-		Map<String, Object> retVal = new HashMap<>();
+		Map<String, Object> retVal = new HashMap<String, Object>();
 		try{
 			DbUtil.getConn(id);
 			retVal.put("success", true);
@@ -186,12 +186,12 @@ public class AppController {
 	 */
 	@RequestMapping("/version/view/{vId}/tree")
 	public @ResponseBody Object viewVersionTree(@PathVariable String vId, @RequestParam String id)throws Exception {
-		List<Map<String, Object>> datas = new ArrayList<>();
+		List<Map<String, Object>> datas = new ArrayList<Map<String, Object>>();
 		Map<String,Object> version = DbUtil.queryRow("SELECT B.NAME,A.CREATE_DATE FROM VERSION A LEFT "
 				+ "JOIN DB B ON A.DB_ID = B.ID WHERE A.ID = ?", vId);
 		if("#".equals(id)){
 			// 根节点
-			Map<String, Object> root = new HashMap<>();
+			Map<String, Object> root = new HashMap<String, Object>();
 			root.put("id", "_ROOT");
 			root.put("text", version.get("NAME"));
 			root.put("icon", "fa fa-desktop");
@@ -199,11 +199,11 @@ public class AppController {
 			datas.add(root);
 			
 			List<Object> tableNames = DbUtil.queryOnes("SELECT DISTINCT TABLE_NAME FROM DB_DETAIL WHERE VERSION_ID = ? ORDER BY TABLE_NAME", vId);
-			List<Map<String, Object>> children = new ArrayList<>(tableNames.size());
+			List<Map<String, Object>> children = new ArrayList<Map<String, Object>>(tableNames.size());
 			root.put("children", children);
 			
 			for(Object tableName : tableNames){
-				Map<String, Object> node = new HashMap<>();
+				Map<String, Object> node = new HashMap<String, Object>();
 				node.put("id", tableName);
 				node.put("text", tableName);
 				node.put("icon", "fa fa-list-alt");
@@ -216,7 +216,7 @@ public class AppController {
 			List<Map<String, Object>> cols = DbUtil.query("SELECT COLUMN_NAME,COLUMN_TYPE,COLUMN_SIZE FROM "
 					+ "DB_DETAIL WHERE VERSION_ID = ? AND TABLE_NAME = ? ORDER BY ID DESC", vId, id);
 			for(Map<String, Object> col : cols){
-				Map<String, Object> node = new HashMap<>();
+				Map<String, Object> node = new HashMap<String, Object>();
 				String name = (String)col.get("COLUMN_NAME");
 				String type = (String)col.get("COLUMN_TYPE");
 				int size = col.containsKey("COLUMN_SIZE") ? Integer.valueOf(col.get("COLUMN_SIZE").toString()) : 0;
@@ -241,7 +241,7 @@ public class AppController {
 	 */
 	@RequestMapping("/version/add")
 	public @ResponseBody Object versionAdd()throws Exception {
-		Map<String, Object> model = new HashMap<>();
+		Map<String, Object> model = new HashMap<String, Object>();
 		String dbid = HttpUtil.getParameter("DB_ID");
 		if(StringUtils.isEmpty(dbid)){
 			throw new Exception("请选择数据库");
@@ -281,7 +281,7 @@ public class AppController {
 		InputStream is = file.getInputStream();
 		compareService.handleUpload(is, DB_ID, descr);
 		is.close();
-		Map<String, Object> result = new HashMap<>();
+		Map<String, Object> result = new HashMap<String, Object>();
 		result.put("success", true);
 		return result;
 	}
@@ -372,7 +372,7 @@ public class AppController {
 		List<ColumnInfo> srcCols = DbUtil.queryColumns(sql, srcId,tableName);
 		List<ColumnInfo> tarCols = DbUtil.queryColumns(sql, tarId,tableName);
 		
-		List<ColumnInfo> distCols = new ArrayList<>();
+		List<ColumnInfo> distCols = new ArrayList<ColumnInfo>();
 		if(srcCols != null && srcCols.size() > 0){
 			for(int i=0;i<srcCols.size();i++){
 				ColumnInfo ci = srcCols.get(i);
@@ -393,13 +393,13 @@ public class AppController {
 				}
 			}
 		}
-		Map<String, Map<String,Object>> map = new HashMap<>();
+		Map<String, Map<String,Object>> map = new HashMap<String, Map<String,Object>>();
 		for(int i=0;i<distCols.size();i++){
 			ColumnInfo col = distCols.get(i);
 			String name = col.getName();
 			Map<String, Object> m = map.get(name);
 			if(m == null){
-				m = new HashMap<>();
+				m = new HashMap<String, Object>();
 				map.put(name, m);
 			}
 			String db = col.getDb();

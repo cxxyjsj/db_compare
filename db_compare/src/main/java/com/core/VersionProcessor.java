@@ -23,7 +23,7 @@ public class VersionProcessor {
 	@Autowired
 	private JdbcTemplate jdbcTemplate;
 	
-	public void process(String versionId,Connection conn, IDbCompartor compartor)throws Exception {
+	public void process(final String versionId,Connection conn, IDbCompartor compartor)throws Exception {
 		final List<ColumnInfo> columns = compartor.getColumns(conn, null);
 		if(columns == null || columns.size() < 1){
 			return;
