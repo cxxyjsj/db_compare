@@ -76,8 +76,8 @@
 	    </div>
     </form>
     <div class="alert alert-success" role="alert">
-    <strong>文件内容格式:</strong><br/>
-      	每行格式: 表名,列名,列类型,列大小
+    <strong>文件内容格式(CSV格式):</strong><br/>
+      	Oracle查询语句: SELECT TABLE_NAME,COLUMN_NAME,DATA_TYPE,DATA_LENGTH FROM USER_TAB_COLUMNS ORDER BY TABLE_NAME,COLUMN_ID; <br />
     </div>
 </div>
 <script>
