@@ -479,7 +479,7 @@ public class AppController {
 		List<Object> moreTables = DbUtil.queryOnes(buf.toString(), srcId, tarId);
 		StringBuilder results = new StringBuilder();
 		String sql = "SELECT TABLE_NAME,COLUMN_NAME,COLUMN_TYPE,COLUMN_SIZE FROM DB_DETAIL "
-				+ "WHERE VERSION_ID = ? AND TABLE_NAME = ?";
+				+ "WHERE VERSION_ID = ? AND TABLE_NAME = ? ORDER BY ID DESC";
 		String type = (String)DbUtil.queryOne("SELECT TYPE FROM DB WHERE ID = (SELECT DB_ID FROM"
 				+ " VERSION WHERE ID = ?)", srcId);
 		if(moreTables != null && moreTables.size() > 0){

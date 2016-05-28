@@ -8,7 +8,7 @@
 		  <div class="panel-heading">
 		  	主版本比目标版本多出的表
 		  	<div class="pull-right">
-		  		<a href="javascript:;" class="btn btn-info" op="compare_export_new" style="position:absolute;right:20px;top:4px;">导出新增表</a>
+		  		<a href="javascript:;" class="btn btn-info" op="compare_export_add" style="position:absolute;right:20px;top:4px;">导出新增表</a>
 		  	</div>
 		  </div>
 		  <div class="panel-body">
