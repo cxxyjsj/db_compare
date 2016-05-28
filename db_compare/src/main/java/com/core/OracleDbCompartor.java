@@ -75,7 +75,11 @@ public class OracleDbCompartor extends AbstractDbCompartor {
 		String sql = "ALTER TABLE " + col.getTableName() + " ADD (" 
 				+ col.getName() + " " + col.getType();
 		if(col.getSize() > 0){
-			sql += "(" + col.getSize() + ")";
+			if("CLOB".equals(col.getType()) || "BLOB".equals(col.getType())){
+				
+			}else{
+				sql += "(" + col.getSize() + ")";
+			}
 		}
 		sql += ");";
 		return sql;
@@ -86,7 +90,11 @@ public class OracleDbCompartor extends AbstractDbCompartor {
 		String sql = "ALTER TABLE " + col.getTableName() + " MODIFY (" 
 				+ col.getName() + " " + col.getType();
 		if(col.getSize() > 0){
-			sql += "(" + col.getSize() + ")";
+			if("CLOB".equals(col.getType()) || "BLOB".equals(col.getType())){
+				
+			}else{
+				sql += "(" + col.getSize() + ")";
+			}
 		}
 		sql += ");";
 		return sql;

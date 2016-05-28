@@ -170,15 +170,24 @@ public class CompareService {
 		
 		// 2. 更新的字段
 		Map<String, ColumnInfo> srcMap = convertMap(srcList);
-		for(ColumnInfo col : tarList){
-			ColumnInfo srcCol = srcMap.get(col.getName());
+		for(ColumnInfo tarCol : tarList){
+			ColumnInfo srcCol = srcMap.get(tarCol.getName());
 			if(srcCol == null){
 				continue;
 			}
-			if(srcCol.equals(col)){
+			if(srcCol.equals(tarCol)){
 				continue;
 			}
-			pw.println(idc.getModifySql(srcCol));
+			if(!tarCol.getType().equals(srcCol.getType())){
+				// 类型不一致,执行可能会报错
+				pw.println("/*字段类型不一致,请注意是否兼容*/");
+				pw.println(idc.getModifySql(tarCol));
+			}else{
+				// 如果目标字段长度比版本长度大则不更新
+				if(tarCol.getSize() < srcCol.getSize()){
+					pw.println(idc.getModifySql(tarCol));
+				}
+			}
 		}
 		pw.println();
 		String result = sw.toString();
