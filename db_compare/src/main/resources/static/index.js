@@ -207,6 +207,7 @@ var version = {
 	import : function(){
 		$.dialog({
 			title : '导入数据库版本',
+			large : true,
 			content : $("#import_template").html(),
 			beforeShow : function(){
 				var $dialog = this;

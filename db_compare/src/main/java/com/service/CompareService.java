@@ -218,7 +218,7 @@ public class CompareService {
 		final String versionId = String.valueOf(DbUtil.queryOne("SELECT ID FROM VERSION WHERE DB_ID = ? AND DESCR = ? AND CREATE_DATE = ?",
 				dbId, descr, date));
 		BufferedReader br = new BufferedReader(new InputStreamReader(is, Charset.forName("UTF-8")));
-		String line = null;
+		String line = br.readLine(); // 去掉标题行
 		List<ColumnInfo> list = new ArrayList<ColumnInfo>(1000);
 		String sql = "INSERT INTO DB_DETAIL(VERSION_ID,TABLE_NAME,COLUMN_NAME,COLUMN_TYPE,COLUMN_SIZE) VALUES (?,?,?,?,?)";
 		ParameterizedPreparedStatementSetter<ColumnInfo> setter = 
@@ -234,7 +234,8 @@ public class CompareService {
 		};
 		// 表名,列名,类型,大小
 		while((line = br.readLine()) != null){
-			String[] tmps = line.trim().split(",");
+			line = line.trim().replaceAll("\"", ""); // 去掉双引号
+			String[] tmps = line.split(",");
 			if(tmps.length < 4){
 				continue;
 			}

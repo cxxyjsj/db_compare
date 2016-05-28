@@ -76,8 +76,9 @@
 	    </div>
     </form>
     <div class="alert alert-success" role="alert">
-    <strong>文件内容格式(CSV格式):</strong><br/>
-      	Oracle查询语句: SELECT TABLE_NAME,COLUMN_NAME,DATA_TYPE,DATA_LENGTH FROM USER_TAB_COLUMNS ORDER BY TABLE_NAME,COLUMN_ID; <br />
+    <strong>PLSQL导出的CSV格式文件:</strong><br/>
+      	Oracle查询语句: SELECT B.TABLE_NAME,B.COLUMN_NAME,B.DATA_TYPE   AS COLUMN_TYPE,B.DATA_LENGTH AS COLUMN_SIZE FROM USER_TABLES A LEFT JOIN USER_TAB_COLUMNS B ON A.TABLE_NAME = B.TABLE_NAME ORDER BY A.TABLE_NAME;
+ <br />
     </div>
 </div>
 <script>
