@@ -18,6 +18,7 @@ import java.util.Properties;
 
 import javax.annotation.Resource;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -75,6 +76,21 @@ public class DbUtil {
 	@Resource
 	public void setJdbcTemplate(JdbcTemplate jdbcTemplate) {
 		DbUtil.jdbcTemplate = jdbcTemplate;
+		// 检测是否存在数据表,如果不存在则创建
+		try{
+			jdbcTemplate.execute("SELECT * FROM DB WHERE 1=2");
+		}catch(Exception e){
+			try{
+				List<String> sqls = IOUtils.readLines(new InputStreamReader(getClass().getResourceAsStream("/db.sql"), Charset.forName("utf-8")));
+				StringBuilder buf = new StringBuilder();
+				for(String sql : sqls){
+					buf.append(sql);
+				}
+				jdbcTemplate.execute(buf.toString());
+			}catch(Exception e1){
+				throw new RuntimeException(e1);
+			}
+		}
 	}
 
 	public static Connection getConn(String driver, String url, String user, String password) throws Exception {
