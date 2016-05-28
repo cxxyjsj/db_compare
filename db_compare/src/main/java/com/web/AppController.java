@@ -351,6 +351,7 @@ public class AppController {
 			List<Object> sameTables = DbUtil.queryOnes(buf.toString(), tarId,srcId);
 			// 获取有差异的表
 			List<String> diffTables = compareService.getDiffTables(srcId, tarId, sameTables);
+			Collections.sort(diffTables);
 			model.put("diffTables", diffTables);
 		}
 		return "compare/result";
