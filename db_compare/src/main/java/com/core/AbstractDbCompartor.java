@@ -52,6 +52,9 @@ public abstract class AbstractDbCompartor implements IDbCompartor {
 			if(!"COLB".equals(type) && !"BLOB".equals(type) && col.getSize() > 0){
 				pw.append("(").append(col.getSize() + "").append(")");
 			}
+			if("WID".equals(col.getName())){
+				pw.append(" NOT NULL PRIMARY KEY");
+			}
 			if(i < cols.size() - 1){
 				pw.append(",");
 			}

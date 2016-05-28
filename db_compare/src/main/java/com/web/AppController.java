@@ -486,7 +486,7 @@ public class AppController {
 			for(Object table : moreTables){
 				String tableName = (String)table;
 				List<ColumnInfo> cols = DbUtil.queryColumns(sql, srcId,tableName);
-				results.append(compareService.getAddSql(type, tableName, cols));
+				results.append(compareService.getCreateSql(type, tableName, cols));
 			}
 		}
 	 	HttpHeaders headers = new HttpHeaders();    
