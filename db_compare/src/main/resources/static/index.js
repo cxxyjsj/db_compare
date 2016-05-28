@@ -264,8 +264,11 @@ var compare = {
 				case 'compare_start' :
 					compare.start();
 					break;
-				case 'compare_export' : 
-					compare.export();
+				case 'compare_export_modify' : 
+					compare.exportModify();
+					break;
+				case 'compare_export_add' : 
+					compare.exportAdd();
 					break;
 			}
 		}).on("click","#diffTable tr",function(){
@@ -301,8 +304,8 @@ var compare = {
 			}
 		});
 	},
-	export : function(){
-		// 导出SQL脚本
+	exportModify : function(){
+		// 导出变更SQL脚本
 		var $diffTable = $("#diffTable");
 		if($diffTable.size() < 1){
 			$.alert("请先比较数据库");
@@ -314,7 +317,22 @@ var compare = {
 			$.alert("必要参数丢失");
 			return;
 		}
-		window.open(basePath + "/export/" + srcId + "_" + tarId);
+		window.open(basePath + "/export_modify/" + srcId + "-" + tarId);
+	},
+	exportAdd : function(){
+		// 导出新增SQL脚本
+		var $diffTable = $("#diffTable");
+		if($diffTable.size() < 1){
+			$.alert("请先比较数据库");
+			return;
+		}
+		var srcId = $diffTable.attr("srcId");
+		var tarId = $diffTable.attr("tarId");
+		if(!srcId || !tarId){
+			$.alert("必要参数丢失");
+			return;
+		}
+		window.open(basePath + "/export_add/" + srcId + "-" + tarId);
 	}
 }
 

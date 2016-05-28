@@ -421,8 +421,8 @@ public class AppController {
 	 * @return
 	 * @throws Exception
 	 */
-	@RequestMapping("/export/{srcId}_{tarId}")
-	public ResponseEntity<byte[]> exportChangeSql(@PathVariable String srcId,
+	@RequestMapping("/export_modify/{srcId}-{tarId}")
+	public ResponseEntity<byte[]> exportModify(@PathVariable String srcId,
 			@PathVariable String tarId)throws Exception {
 		StringBuilder buf = new StringBuilder();
 		buf.append("SELECT DISTINCT TABLE_NAME FROM DB_DETAIL WHERE VERSION_ID = ? ");
@@ -457,5 +457,42 @@ public class AppController {
         headers.setContentDispositionFormData("attachment", fileName);   
         headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
         return new ResponseEntity<byte[]>(results.getBytes(Charset.forName("UTF-8")), headers, HttpStatus.CREATED);    
+	}
+	
+	/**
+	 * 导出新增表
+	 * @author cxxyjsj
+	 * @date 2016年5月28日 下午5:00:49
+	 * @param srcId
+	 * @param tarId
+	 * @return
+	 * @throws Exception
+	 */
+	@RequestMapping("/export_add/{srcId}-{tarId}")
+	public ResponseEntity<byte[]> exportAdd(@PathVariable String srcId,
+			@PathVariable String tarId)throws Exception {
+		StringBuilder buf = new StringBuilder();
+		buf.append("SELECT DISTINCT TABLE_NAME FROM DB_DETAIL WHERE VERSION_ID = ? ");
+		buf.append(" AND TABLE_NAME NOT IN(")
+		   .append("SELECT DISTINCT TABLE_NAME FROM DB_DETAIL WHERE VERSION_ID = ? ");
+		buf.append(") ORDER BY TABLE_NAME");
+		List<Object> moreTables = DbUtil.queryOnes(buf.toString(), srcId, tarId);
+		StringBuilder results = new StringBuilder();
+		String sql = "SELECT TABLE_NAME,COLUMN_NAME,COLUMN_TYPE,COLUMN_SIZE FROM DB_DETAIL "
+				+ "WHERE VERSION_ID = ? AND TABLE_NAME = ?";
+		String type = (String)DbUtil.queryOne("SELECT TYPE FROM DB WHERE ID = (SELECT DB_ID FROM"
+				+ " VERSION WHERE ID = ?)", srcId);
+		if(moreTables != null && moreTables.size() > 0){
+			for(Object table : moreTables){
+				String tableName = (String)table;
+				List<ColumnInfo> cols = DbUtil.queryColumns(sql, srcId,tableName);
+				results.append(compareService.getAddSql(type, tableName, cols));
+			}
+		}
+	 	HttpHeaders headers = new HttpHeaders();    
+        String fileName= "Database create.sql";
+        headers.setContentDispositionFormData("attachment", fileName);   
+        headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+        return new ResponseEntity<byte[]>(results.toString().getBytes(Charset.forName("UTF-8")), headers, HttpStatus.CREATED);    
 	}
 }

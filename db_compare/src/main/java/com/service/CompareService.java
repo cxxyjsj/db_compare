@@ -137,6 +137,14 @@ public class CompareService {
 		return results;
 	}
 	
+	public String getAddSql(String type, String tableName, List<ColumnInfo> cols)throws Exception {
+		IDbCompartor idc = (IDbCompartor)SpringUtil.getBean("comparator." + type);
+		if(idc == null){
+			throw new Exception("暂未支持的数据库类型:" + type);
+		}
+		return idc.getCreateSql(tableName, cols);
+	}
+	
 	/**
 	 * 获取变更的SQL脚本
 	 * @author cxxyjsj

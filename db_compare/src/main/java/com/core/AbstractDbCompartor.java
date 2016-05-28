@@ -1,5 +1,7 @@
 package com.core;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
@@ -36,5 +38,26 @@ public abstract class AbstractDbCompartor implements IDbCompartor {
 			log.error(this,e);
 		}
 		return results;
+	}
+	
+	@Override
+	public String getCreateSql(String tableName, List<ColumnInfo> cols) {
+		StringWriter sw = new StringWriter();
+		PrintWriter pw = new PrintWriter(sw);
+		pw.append("CREATE TABLE ").append(tableName).println("(");
+		for(int i=0;i<cols.size();i++){
+			ColumnInfo col = cols.get(i);
+			pw.append("\t").append(col.getName()).append(" ").append(col.getType());
+			String type = col.getType();
+			if(!"COLB".equals(type) && !"BLOB".equals(type) && col.getSize() > 0){
+				pw.append("(").append(col.getSize() + "").append(")");
+			}
+			if(i < cols.size() - 1){
+				pw.append(",");
+			}
+			pw.println();
+		}
+		pw.println(");");
+		return sw.toString();
 	}
 }

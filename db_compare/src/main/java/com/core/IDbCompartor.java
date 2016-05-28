@@ -47,4 +47,14 @@ public interface IDbCompartor {
 	 * @return
 	 */
 	public String getModifySql(ColumnInfo col);
+	
+	/**
+	 * 获取创建表SQL
+	 * @author cxxyjsj
+	 * @date 2016年5月28日 下午5:09:15
+	 * @param tableName
+	 * @param cols
+	 * @return
+	 */
+	public String getCreateSql(String tableName, List<ColumnInfo> cols);
 }

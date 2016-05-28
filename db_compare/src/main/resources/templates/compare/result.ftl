@@ -5,7 +5,12 @@
 <div class="row">
 	<div class="col-md-4">
 		<div class="panel panel-default">
-		  <div class="panel-heading">主版本比目标版本多出的表</div>
+		  <div class="panel-heading">
+		  	主版本比目标版本多出的表
+		  	<div class="pull-right">
+		  		<a href="javascript:;" class="btn btn-info" op="compare_export_new" style="position:absolute;right:20px;top:4px;">导出新增表</a>
+		  	</div>
+		  </div>
 		  <div class="panel-body">
 		    <#if moreTables?size gt 0>
 		    <table class="table table-condensed">
@@ -58,7 +63,7 @@
 		  <div class="panel-heading">
 		  	差异的表
 		  	<div class="pull-right">
-		  		<a href="javascript:;" class="btn btn-info" op="compare_export" style="position:absolute;right:20px;top:4px;">导出变更脚本</a>
+		  		<a href="javascript:;" class="btn btn-info" op="compare_export_modify" style="position:absolute;right:20px;top:4px;">导出变更表</a>
 		  	</div>
 		  </div>
 		  <div class="panel-body">
