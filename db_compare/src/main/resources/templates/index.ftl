@@ -39,6 +39,9 @@
                         <li>
                             <a href="#compare" class="active"><i class="fa fa-bar-chart-o fa-fw"></i>数据库比较</a>
                         </li>
+                        <li>
+                            <a href="#app" class="active"><i class="fa fa-windows fa-fw"></i>应用维护</a>
+                        </li>
                     </ul>
                 </div>
             </div>
