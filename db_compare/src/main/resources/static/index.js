@@ -207,20 +207,20 @@ var version = {
 				   // 显示匹配的节点
 				   var data = $tree.data("jstree")._model.data;
 				   text = text.toLowerCase();
-				   var cnt = 0;
 				   for(var name in data){
 					   if(name == "#" || name == "_ROOT"){
 						   continue;
 					   }
+					   var node = data[name];
 					   if(name.toLowerCase().indexOf(text) >= 0){
 						   $tree.jstree("show_node",name,true);
-						   cnt++;
+						   if(node.parent){
+							   $tree.jstree("show_node",node.parent,true);
+						   }
 					   }else{
 						   $tree.jstree("hide_node",name,true);
 					   }
 				   }
-				   var tmps = $tree.jstree("get_text","_ROOT").split("(");
-				   $tree.jstree("set_text","_ROOT",tmps[0] + "(" + cnt + ")");
 				   $tree.jstree("redraw",true);
 			   }
 			}
