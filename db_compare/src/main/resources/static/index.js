@@ -181,7 +181,13 @@ var version = {
 						actions.push({
 							label : "生成脚本",
 							icon : "fa fa-leaf",
-							action : version.genScript
+							action : version.genAppScript
+						});
+					}else{
+						actions.push({
+							label : "生成脚本",
+							icon : "fa fa-leaf",
+							action : version.genTableScript
 						});
 					}
 					cb(actions);
@@ -220,13 +226,22 @@ var version = {
 			}
 		});
 	},
-	genScript : function(menu){
+	genAppScript : function(menu){
 		var $tree = $("#tree");
 		var node = $tree.jstree("get_node",menu.reference);
 		if(node){
 			var appId = node.id;
 			var vid = $("#version_view").attr("mid");
-			window.open(basePath + "/gen_script/" + vid + "/" + appId);
+			window.open(basePath + "/gen_app_script/" + vid + "/" + appId);
+		}
+	},
+	genTableScript : function(menu){
+		var $tree = $("#tree");
+		var node = $tree.jstree("get_node",menu.reference);
+		if(node){
+			var tableName = node.id;
+			var vid = $("#version_view").attr("mid");
+			window.open(basePath + "/gen_table_script/" + vid + "/" + tableName);
 		}
 	},
 	import : function(){

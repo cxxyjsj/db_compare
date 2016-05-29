@@ -548,12 +548,32 @@ public class AppController {
 	 * @return
 	 * @throws Exception
 	 */
-	@RequestMapping("/gen_script/{vId}/{appId}")
-	public ResponseEntity<byte[]> genScript(@PathVariable String vId,
+	@RequestMapping("/gen_app_script/{vId}/{appId}")
+	public ResponseEntity<byte[]> genAppScript(@PathVariable String vId,
 			@PathVariable String appId)throws Exception {
-		String results = compareService.genScript(vId, appId);
+		String results = compareService.genAppScript(vId, appId);
 	 	HttpHeaders headers = new HttpHeaders();    
         String fileName= appId + "-ddl.sql";
+        headers.setContentDispositionFormData("attachment", fileName);   
+        headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+        return new ResponseEntity<byte[]>(results.toString().getBytes(Charset.forName("UTF-8")), headers, HttpStatus.CREATED);    
+	}
+	
+	/**
+	 * 生成表脚本
+	 * @author cxxyjsj
+	 * @date 2016年5月29日 下午8:59:13
+	 * @param vId
+	 * @param tableName
+	 * @return
+	 * @throws Exception
+	 */
+	@RequestMapping("/gen_table_script/{vId}/{tableName}")
+	public ResponseEntity<byte[]> genTableScript(@PathVariable String vId,
+			@PathVariable String tableName)throws Exception {
+		String results = compareService.genTableScript(vId, tableName);
+	 	HttpHeaders headers = new HttpHeaders();    
+        String fileName= tableName + "-ddl.sql";
         headers.setContentDispositionFormData("attachment", fileName);   
         headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
         return new ResponseEntity<byte[]>(results.toString().getBytes(Charset.forName("UTF-8")), headers, HttpStatus.CREATED);    
