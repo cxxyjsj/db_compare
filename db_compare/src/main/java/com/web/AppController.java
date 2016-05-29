@@ -198,19 +198,61 @@ public class AppController {
 			root.put("state",Collections.singletonMap("opened", true));
 			datas.add(root);
 			
-			List<Object> tableNames = DbUtil.queryOnes("SELECT DISTINCT TABLE_NAME FROM DB_DETAIL WHERE VERSION_ID = ? ORDER BY TABLE_NAME", vId);
-			List<Map<String, Object>> children = new ArrayList<Map<String, Object>>(tableNames.size());
-			root.put("children", children);
-			
-			for(Object tableName : tableNames){
-				Map<String, Object> node = new HashMap<String, Object>();
-				node.put("id", tableName);
-				node.put("text", tableName);
-				node.put("icon", "fa fa-list-alt");
-				node.put("state", Collections.singletonMap("opened", false));
-				node.put("children", true);
-				children.add(node);
+			// 建立应用分组
+			List<Map<String, Object>> apps = DbUtil.query("SELECT NAME,TITLE FROM APP ORDER BY PX");
+			if(apps != null && apps.size() > 0){
+				for(Map<String, Object> app : apps){
+					String name = (String)app.remove("NAME");
+					String title = (String)app.remove("TITLE");
+					app.put("id", name);
+					app.put("text", title);
+					app.put("icon", "fa fa-windows");
+					app.put("state", Collections.singletonMap("opened", false));
+					List<Object> tableNames = DbUtil.queryOnes("SELECT DISTINCT TABLE_NAME FROM DB_DETAIL "
+							+ "WHERE VERSION_ID = ? AND TABLE_NAME IN(SELECT TABLE_NAME FROM APP_TABLE "
+							+ "WHERE APP_NAME = ?)ORDER BY TABLE_NAME", vId, name);
+					List<Map<String, Object>> children = new ArrayList<Map<String, Object>>(tableNames.size());
+					app.put("children", children);
+					
+					if(tableNames != null && tableNames.size() > 0){
+						for(Object tableName : tableNames){
+							Map<String, Object> node = new HashMap<String, Object>();
+							node.put("id", tableName);
+							node.put("text", tableName);
+							node.put("icon", "fa fa-list-alt");
+							node.put("state", Collections.singletonMap("opened", false));
+							node.put("children", true);
+							children.add(node);
+						}
+					}
+				}
+			}else{
+				apps = new ArrayList<>(1);
 			}
+			// 查询其他分组
+			List<Object> tableNames = DbUtil.queryOnes("SELECT DISTINCT TABLE_NAME FROM DB_DETAIL "
+					+ "WHERE VERSION_ID = ? AND TABLE_NAME NOT IN(SELECT TABLE_NAME FROM APP_TABLE "
+					+ ")ORDER BY TABLE_NAME", vId);
+			if(tableNames != null && tableNames.size() > 0){
+				Map<String, Object> app = new HashMap<>();
+				app.put("id", "UNCATEGORY");
+				app.put("text", "未分组");
+				app.put("icon", "fa fa-windows");
+				app.put("state", Collections.singletonMap("opened", false));
+				List<Map<String, Object>> children = new ArrayList<>(tableNames.size());
+				for(Object tableName : tableNames){
+					Map<String, Object> node = new HashMap<String, Object>();
+					node.put("id", tableName);
+					node.put("text", tableName);
+					node.put("icon", "fa fa-list-alt");
+					node.put("state", Collections.singletonMap("opened", false));
+					node.put("children", true);
+					children.add(node);
+				}
+				app.put("children", children);
+				apps.add(app);
+			}
+			root.put("children", apps);
 		}else{
 			// 查询列信息
 			List<Map<String, Object>> cols = DbUtil.query("SELECT COLUMN_NAME,COLUMN_TYPE,COLUMN_SIZE FROM "
