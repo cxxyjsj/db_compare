@@ -170,6 +170,22 @@ var version = {
 						cb(resp);
 					});
 				}
+			},
+			plugins : ["contextmenu"],
+			contextmenu : {
+				items : function(node,cb){
+					var actions = [];
+					if(node.id == "_ROOT"){
+						
+					}else if(node.parents.length < 3){
+						actions.push({
+							label : "生成脚本",
+							icon : "fa fa-leaf",
+							action : version.genScript
+						});
+					}
+					cb(actions);
+				}
 			}
 		});
 		$("#txtSearch").keydown(function(e){
@@ -203,6 +219,15 @@ var version = {
 			   }
 			}
 		});
+	},
+	genScript : function(menu){
+		var $tree = $("#tree");
+		var node = $tree.jstree("get_node",menu.reference);
+		if(node){
+			var appId = node.id;
+			var vid = $("#version_view").attr("mid");
+			window.open(basePath + "/gen_script/" + vid + "/" + appId);
+		}
 	},
 	import : function(){
 		$.dialog({

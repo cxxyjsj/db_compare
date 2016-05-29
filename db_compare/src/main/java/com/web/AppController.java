@@ -540,6 +540,26 @@ public class AppController {
 	}
 	
 	/**
+	 * 生成脚本
+	 * @author cxxyjsj
+	 * @date 2016年5月29日 下午4:43:48
+	 * @param vId
+	 * @param appId
+	 * @return
+	 * @throws Exception
+	 */
+	@RequestMapping("/gen_script/{vId}/{appId}")
+	public ResponseEntity<byte[]> genScript(@PathVariable String vId,
+			@PathVariable String appId)throws Exception {
+		String results = compareService.genScript(vId, appId);
+	 	HttpHeaders headers = new HttpHeaders();    
+        String fileName= appId + "-ddl.sql";
+        headers.setContentDispositionFormData("attachment", fileName);   
+        headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+        return new ResponseEntity<byte[]>(results.toString().getBytes(Charset.forName("UTF-8")), headers, HttpStatus.CREATED);    
+	}
+	
+	/**
 	 * 进入app维护页面
 	 * @author cxxyjsj
 	 * @date 2016年5月29日 上午8:32:34
