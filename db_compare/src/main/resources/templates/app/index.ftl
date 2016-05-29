@@ -1,38 +1,37 @@
-<div id="db_container">
-<div class="btn-tools">
-	<a href="javascript:;" class="btn btn-primary" op="db_add">新增</a>
-</div>
-<table class="table table-bordered" id="dbTable">
-  <thead>
-    <tr>
-      <th>数据库编码</th>
-      <th>数据库名称</th>
-      <th>数据库类型</th>
-      <th>操作</th>
-    </tr>
-  </thead>
-  <tbody>
-  	<#if dbs?size gt 0>
-  	<#list dbs as db>
-  	<tr mid="${db.ID}">
-      <td>${db.CODE}</th>
-      <td>${db.NAME}</td>
-      <td>${db.TYPE}</td>
-      <td>
-      	<a href="javascript:;" class="btn btn-sm btn-primary" op="db_test">测试连接</a>
-      	<a href="javascript:;" class="btn btn-sm btn-info" op="db_edit">修改</a>
-      	<a href="javascript:;" class="btn btn-sm btn-danger" op="db_del">删除</a>
-      </td>
-    </tr>
-  	</#list>
-  	<#else>
-  	<tr>
-  		<td colspan="4" style="text-align:center;">暂无数据...</td>
-  	</tr>
-  	</#if>
-  </tbody>
-</table>
+<div id="app_container">
+	<div class="col-md-6" style="padding:0;">
+		<div class="panel panel-default">
+			<div class="panel-heading">
+				应用目录
+			</div>
+			<div class="panel-body">
+				<div class="input-group" style="margin-bottom:10px;">
+                    <input id="appSearch" type="text" class="form-control" placeholder="输入关键字回车键过滤">
+                    <span class="input-group-btn">
+	                    <button class="btn btn-default" type="button">
+	                        <i class="fa fa-search"></i>
+	                    </button>
+	                </span>
+                </div>
+				<div id="app_tree">
+				
+				</div>
+			</div>
+		</div>
+	</div>
+	<div id="app_form" style="display:none;">
+	<form>
+		<div class="form-group">
+	        <label>应用ID</label>
+	        <input type="text" class="form-control validate[required]" name="NAME">
+	    </div>
+	    <div class="form-group">
+	        <label>应用名称</label>
+	        <input type="text" class="form-control validate[required]" name="TITLE">
+	    </div>
+    </form>
+    </div>
 </div>
 <script>
-	db.init();
+	app.init();
 </script>

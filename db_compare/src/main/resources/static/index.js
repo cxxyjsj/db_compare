@@ -336,6 +336,140 @@ var compare = {
 	}
 }
 
+var app = {
+	init : function(){
+		$('#app_tree').jstree({
+			core : {
+				data : function(node,cb){
+					$.post(basePath + "/app/tree",{id : node.id},function(resp){
+						cb(resp);
+					});
+				}
+			},
+			plugins : ["contextmenu"],
+			contextmenu : {
+				items : function(node,cb){
+					var actions = [];
+					if(node.id == "_ROOT"){
+						// 点击根节点
+						actions.push({
+							label : "添加应用",
+							icon : "fa fa-plus",
+							action : app.addApp
+						});
+					}else if(node.parents.length < 3){
+						actions.push({
+							label : "添加",
+							icon : "fa fa-plus",
+							action : app.addAppTable
+						});
+					}else{
+						actions.push({
+							label : "删除",
+							icon : "fa fa-minus",
+							action : app.removeAppTable
+						});
+					}
+					cb(actions);
+				}
+			}
+		});
+		$("#appSearch").keydown(function(e){
+			if(e.keyCode==13){
+			   var $tree = $("#app_tree");
+			   var text = $(this).val();
+			   if(!text){
+				   // 显示所有节点
+				   $tree.jstree("show_all");
+				   var tmps = $tree.jstree("get_text","_ROOT").split("(");
+				   $tree.jstree("set_text","_ROOT",tmps[0]);
+			   }else{
+				   // 显示匹配的节点
+				   var data = $tree.data("jstree")._model.data;
+				   text = text.toLowerCase();
+				   for(var name in data){
+					   var node = data[name];
+					   if(name == "#" || name == "_ROOT"){
+						   continue;
+					   }
+					   if(name.toLowerCase().indexOf(text) >= 0){
+						   $tree.jstree("show_node",name,true);
+						   if(node.parent){
+							   $tree.jstree("show_node",node.parent,true);
+						   }
+					   }else{
+						   $tree.jstree("hide_node",name,true);
+					   }
+				   }
+				   $tree.jstree("redraw",true);
+			   }
+			}
+		});
+	},
+	// 添加应用
+	addApp : function(){
+		$.dialog({
+			title : '添加应用',
+			content : $("#app_form").html(),
+			beforeShow : function(){
+				this.find("form").validationEngine();
+				this.find("[name]").val("");
+			},
+			callback : function(op){
+				if(op == "ok"){
+					var $form = this.find("form");
+					if($form.validationEngine("validate")){
+						$.post(basePath + "/app/add",$form.serialize(),function(resp){
+							if(resp.success){
+								$.msg("添加成功",function(){
+									location.reload();
+								});
+							}
+						});
+					}
+					return false;
+				}
+			}
+		});
+	},
+	addAppTable : function(menu){
+		// 获取应用名
+		var $tree = $("#app_tree");
+		var node = $tree.jstree("get_node",menu.reference);
+		if(node){
+			var appId = node.id;
+			$.prompt("请输入表名",function(tableName){
+				if(tableName){
+					$.post(basePath + "/app/addTable",{appId : appId, tableName : tableName},function(resp){
+						if(resp.success){
+							$.msg("添加成功",function(){
+								location.reload();
+							});
+						}
+					});
+				}
+			})
+		}
+	},
+	removeAppTable : function(menu){
+		// 获取应用名
+		var $tree = $("#app_tree");
+		var node = $tree.jstree("get_node",menu.reference);
+		if(node){
+			var tableName = node.id;
+			$.confirm("确定删除吗?",function(){
+				$.post(basePath + "/app/removeTable",{tableName : tableName},function(resp){
+					if(resp.success){
+						$.msg("删除成功",function(){
+							location.reload();
+						});
+					}
+				});
+			});
+		}
+	}
+}
+
 $(function(){
 	$.initRouter($("#page-wrapper"),function(){
 		this.append('<div style="clear:both;"></div>');

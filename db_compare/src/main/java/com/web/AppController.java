@@ -496,4 +496,144 @@ public class AppController {
         headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
         return new ResponseEntity<byte[]>(results.toString().getBytes(Charset.forName("UTF-8")), headers, HttpStatus.CREATED);    
 	}
+	
+	/**
+	 * 进入app维护页面
+	 * @author cxxyjsj
+	 * @date 2016年5月29日 上午8:32:34
+	 * @param model
+	 * @return
+	 * @throws Exception
+	 */
+	@RequestMapping("/app")
+	public String app(ModelMap model)throws Exception {
+		// 查询所有表
+		model.put("tableNames", DbUtil.queryOnes("SELECT DISTINCT TABLE_NAME FROM DB_DETAIL ORDER BY TABLE_NAME"));
+		return "app/index";
+	}
+	
+	/**
+	 * 添加应用
+	 * @author cxxyjsj
+	 * @date 2016年5月29日 下午2:04:40
+	 * @param model
+	 * @return
+	 * @throws Exception
+	 */
+	@RequestMapping("/app/add")
+	public @ResponseBody Map<String, Object> addApp()throws Exception {
+		Map<String, Object> retVal = new HashMap<>();
+		String name = HttpUtil.getParameter("NAME");
+		String title = HttpUtil.getParameter("TITLE");
+		if(StringUtils.isEmpty(name)){
+			throw new Exception("应用ID不能为空");
+		}
+		if(StringUtils.isEmpty(title)){
+			throw new Exception("应用名称不能为空");
+		}
+		int cnt = DbUtil.queryInt("SELECT COUNT(*) FROM APP WHERE NAME = ? OR TITLE = ? OR NAME = ? OR TITLE = ?",
+				name,name,title,title);
+		if(cnt > 0){
+			throw new Exception("存在相同应用ID或名称");
+		}
+		DbUtil.execute("INSERT INTO APP(NAME,TITLE) VALUES(?,?)", name, title);
+		retVal.put("success", true);
+		return retVal;
+	}
+	
+	/**
+	 * 添加应用表
+	 * @author cxxyjsj
+	 * @date 2016年5月29日 下午2:27:32
+	 * @return
+	 * @throws Exception
+	 */
+	@RequestMapping("/app/addTable")
+	public @ResponseBody Map<String, Object> addTable()throws Exception {
+		Map<String, Object> retVal = new HashMap<>();
+		String appId = HttpUtil.getParameter("appId");
+		String tableName = HttpUtil.getParameter("tableName");
+		if(StringUtils.isEmpty(appId)){
+			throw new Exception("应用ID不能为空");
+		}
+		if(StringUtils.isEmpty(tableName)){
+			throw new Exception("表名不能为空");
+		}
+		tableName = tableName.toUpperCase();
+		String appName = (String)DbUtil.queryOne("SELECT APP_NAME FROM APP_TABLE WHERE TABLE_NAME = ?", tableName);
+		if(!StringUtils.isEmpty(appName)){
+			throw new Exception("表[" + tableName + "]已关联应用[" + appName + "]");
+		}
+		DbUtil.execute("INSERT INTO APP_TABLE(APP_NAME,TABLE_NAME) VALUES(?,?)", appId, tableName);
+		retVal.put("success", true);
+		return retVal;
+	}
+	
+	/**
+	 * 移除应用表
+	 * @author cxxyjsj
+	 * @date 2016年5月29日 下午2:27:42
+	 * @return
+	 * @throws Exception
+	 */
+	@RequestMapping("/app/removeTable")
+	public @ResponseBody Map<String, Object> removeTable()throws Exception {
+		Map<String, Object> retVal = new HashMap<>();
+		String tableName = HttpUtil.getParameter("tableName");
+		if(StringUtils.isEmpty(tableName)){
+			throw new Exception("表名不能为空");
+		}
+		tableName = tableName.toUpperCase();
+		DbUtil.execute("DELETE FROM APP_TABLE WHERE TABLE_NAME = ?", tableName);
+		retVal.put("success", true);
+		return retVal;
+	}
+	
+	/**
+	 * 加载应用树
+	 * @author cxxyjsj
+	 * @date 2016年5月29日 上午11:21:44
+	 * @param id
+	 * @return
+	 * @throws Exception
+	 */
+	@RequestMapping("/app/tree")
+	public @ResponseBody Object appTree(@RequestParam String id)throws Exception {
+		List<Map<String, Object>> datas = new ArrayList<Map<String, Object>>();
+		if("#".equals(id)){
+			// 根节点
+			Map<String, Object> root = new HashMap<String, Object>();
+			root.put("id", "_ROOT");
+			root.put("text", "应用集");
+			root.put("icon", "fa fa-desktop");
+			root.put("state",Collections.singletonMap("opened", true));
+			datas.add(root);
+			List<Map<String, Object>> apps = DbUtil.query("SELECT NAME,TITLE FROM APP ORDER BY PX");
+			if(apps != null && apps.size() > 0){
+				for(Map<String, Object> app : apps){
+					String name = (String)app.remove("NAME");
+					String title = (String)app.remove("TITLE");
+					app.put("id", name);
+					app.put("text", title);
+					app.put("icon", "fa fa-windows");
+					app.put("state", Collections.singletonMap("opened", false));
+					app.put("children", true);
+				}
+				root.put("children", apps);
+			}
+		}else{
+			// 查询表信息
+			List<Object> tableNames = DbUtil.queryOnes("SELECT TABLE_NAME FROM APP_TABLE WHERE APP_NAME = ? ORDER BY TABLE_NAME", id);
+			for(Object tableName : tableNames){			
+				Map<String, Object> node = new HashMap<String, Object>();
+				node.put("id", tableName);
+				node.put("parent", id);
+				node.put("icon", "fa fa-laptop");
+				node.put("text", tableName);
+				node.put("state", Collections.singletonMap("opened", true));
+				datas.add(node);
+			}
+		}
+		return datas;
+	}
 }

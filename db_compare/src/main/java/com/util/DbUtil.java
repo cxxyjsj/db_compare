@@ -144,6 +144,14 @@ public class DbUtil {
 		return jdbcTemplate.query(sql, params, defaultSingleValueResultSetExtractor);
 	}
 	
+	public static int queryInt(String sql, Object... params)throws Exception {
+		Object obj = queryOne(sql, params);
+		if(obj != null){
+			return Integer.valueOf(obj.toString());
+		}
+		return 0;
+	}
+	
 	/**
 	 * 查询第一列数据
 	 * @param sql

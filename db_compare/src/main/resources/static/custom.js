@@ -162,6 +162,16 @@ $.extend({
 			}
 		},opts));
 	},
+	prompt : function(msg,fn){
+		layer.prompt({
+			title : msg,
+			formType : 0
+		},function(msg,index,$input){
+			if(fn(msg,index,$input) !== false){
+				layer.close(index);
+			}
+		});
+	},
 	msg : function(msg,fn,time){
 		layer.msg($.escapeHtml(msg),{time : time ? time :1500},fn);
 	},
