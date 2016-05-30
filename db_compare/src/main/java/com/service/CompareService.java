@@ -99,6 +99,16 @@ public class CompareService {
 	}
 	
 	@Transactional
+	public void deleteDb(String id)throws Exception {
+		// 删除备份记录
+		DbUtil.execute("DELETE FROM DB_DETAIL WHERE VERSION_ID IN(SELECT ID FROM VERSION WHERE DB_ID = ?)", id);
+		// 删除版本信息
+		DbUtil.execute("DELETE FROM VERSION WHERE DB_ID = ?", id);
+		// 删除数据库配置信息
+		DbUtil.execute("DELETE FROM DB WHERE ID = ?", id);
+	}
+	
+	@Transactional
 	public void deleteVersion(String id)throws Exception {
 		DbUtil.execute("DELETE FROM VERSION WHERE ID = ?",id);
 		DbUtil.execute("DELETE FROM DB_DETAIL WHERE VERSION_ID = ?", id);

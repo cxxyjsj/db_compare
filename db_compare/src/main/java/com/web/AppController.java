@@ -108,7 +108,7 @@ public class AppController {
 	@RequestMapping("/db/del/{id}")
 	public @ResponseBody Object dbDel(@PathVariable String id)throws Exception {
 		Map<String, Object> model = new HashMap<String, Object>();
-		DbUtil.execute("DELETE FROM DB WHERE ID = ?", id);
+		compareService.deleteDb(id);
 		model.put("success", true);
 		return model;
 	}
