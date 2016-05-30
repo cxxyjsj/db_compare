@@ -8,5 +8,8 @@
 		</#list>
 		</#if>
 	</table>
+	<index name="PK_${table.NAME}" type="key" tableName="${table.NAME}">
+		<column name="WID"/>
+	</index>
 	</#list>
 </dbVersion>

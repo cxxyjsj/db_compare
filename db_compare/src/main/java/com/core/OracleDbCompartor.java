@@ -90,7 +90,7 @@ public class OracleDbCompartor extends AbstractDbCompartor {
 		String sql = "ALTER TABLE " + col.getTableName() + " MODIFY (" 
 				+ col.getName() + " " + col.getType();
 		if(col.getSize() > 0){
-			if("CLOB".equals(col.getType()) || "BLOB".equals(col.getType())){
+			if("DATE".equals(col.getType()) || "CLOB".equals(col.getType()) || "BLOB".equals(col.getType())){
 				
 			}else{
 				sql += "(" + col.getSize() + ")";

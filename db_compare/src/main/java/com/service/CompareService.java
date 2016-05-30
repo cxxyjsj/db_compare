@@ -219,34 +219,7 @@ public class CompareService {
 				+ "WHERE VERSION_ID = ? AND TABLE_NAME IN(SELECT TABLE_NAME FROM "
 				+ "APP_TABLE WHERE APP_NAME = ?) ORDER BY TABLE_NAME", vId, appId);
 		if(tableNames != null && tableNames.size() > 0){
-			List<Map<String, Object>> tables = new ArrayList<>(tableNames.size());
-			for(int i=0;i<tableNames.size();i++){
-				String tableName = (String)tableNames.get(i);
-				Map<String, Object> table = new HashMap<>();
-				tables.add(table);
-				table.put("NAME", tableName);
-				// 查询列
-				List<Map<String, Object>> cols = DbUtil.query("SELECT COLUMN_NAME,COLUMN_TYPE,"
-						+ "COLUMN_SIZE FROM DB_DETAIL WHERE VERSION_ID = ? AND TABLE_NAME = ? "
-						+ "ORDER BY ID", vId, tableName);
-				if(cols != null && cols.size() > 0){
-					for(Map<String, Object> col : cols){
-						String name = (String)col.remove("COLUMN_NAME");
-						String type = (String)col.remove("COLUMN_TYPE");
-						int size = Integer.valueOf(col.remove("COLUMN_SIZE").toString());
-						col.put("NAME", name);
-						String tType = ColMapUtil.getScriptType(type); // 获取目标类型
-						if(!"CLOB".equals(type) && !"BLOB".equals(type) && size > 0){
-							tType += "(" + size + ")";
-						}
-						col.put("TYPE", tType);
-					}
-					table.put("cols", cols);
-				}
-			}
-			Map<String, Object> model = new HashMap<>();
-			model.put("tables", tables);
-			return TemplateUtil.processTemplate("script/table_gen_script.ftl", model);
+			return TemplateUtil.processTemplate("script/table_gen_script.ftl", getScriptModel(vId, tableNames.toArray(new String[0])));
 		}
 		return "";
 	}
@@ -261,31 +234,50 @@ public class CompareService {
 	 * @throws Exception
 	 */
 	public String genTableScript(String vId, String tableName)throws Exception {
-		List<Map<String, Object>> tables = new ArrayList<>(1);
-		Map<String, Object> table = new HashMap<>();
-		tables.add(table);
-		table.put("NAME", tableName);
-		// 查询列
-		List<Map<String, Object>> cols = DbUtil.query("SELECT COLUMN_NAME,COLUMN_TYPE,"
-				+ "COLUMN_SIZE FROM DB_DETAIL WHERE VERSION_ID = ? AND TABLE_NAME = ? "
-				+ "ORDER BY ID", vId, tableName);
-		if(cols != null && cols.size() > 0){
-			for(Map<String, Object> col : cols){
-				String name = (String)col.remove("COLUMN_NAME");
-				String type = (String)col.remove("COLUMN_TYPE");
-				int size = Integer.valueOf(col.remove("COLUMN_SIZE").toString());
-				col.put("NAME", name);
-				String tType = ColMapUtil.getScriptType(type); // 获取目标类型
-				if(!"CLOB".equals(type) && !"BLOB".equals(type) && size > 0){
-					tType += "(" + size + ")";
+		return TemplateUtil.processTemplate("script/table_gen_script.ftl", getScriptModel(vId, new String[]{tableName}));
+	}
+	
+	/**
+	 * 生成表模型
+	 * @author cxxyjsj
+	 * @date 2016年5月30日 下午6:09:10
+	 * @param vId
+	 * @param tableNames
+	 * @return
+	 * @throws Exception
+	 */
+	private Map<String, Object> getScriptModel(String vId, String... tableNames)throws Exception {
+		if(tableNames != null && tableNames.length > 0){
+			List<Map<String, Object>> tables = new ArrayList<>(tableNames.length);
+			for(int i=0;i<tableNames.length;i++){
+				String tableName = (String)tableNames[i];
+				Map<String, Object> table = new HashMap<>();
+				tables.add(table);
+				table.put("NAME", tableName);
+				// 查询列
+				List<Map<String, Object>> cols = DbUtil.query("SELECT COLUMN_NAME,COLUMN_TYPE,"
+						+ "COLUMN_SIZE FROM DB_DETAIL WHERE VERSION_ID = ? AND TABLE_NAME = ? "
+						+ "ORDER BY ID", vId, tableName);
+				if(cols != null && cols.size() > 0){
+					for(Map<String, Object> col : cols){
+						String name = (String)col.remove("COLUMN_NAME");
+						String type = (String)col.remove("COLUMN_TYPE");
+						int size = Integer.valueOf(col.remove("COLUMN_SIZE").toString());
+						col.put("NAME", name);
+						String tType = ColMapUtil.getScriptType(type); // 获取目标类型
+						if(!"DATE".equals(type) && !"CLOB".equals(type) && !"BLOB".equals(type) && size > 0){
+							tType += "(" + size + ")";
+						}
+						col.put("TYPE", tType);
+					}
+					table.put("cols", cols);
 				}
-				col.put("TYPE", tType);
 			}
-			table.put("cols", cols);
+			Map<String, Object> model = new HashMap<>();
+			model.put("tables", tables);
+			return model;
 		}
-		Map<String, Object> model = new HashMap<>();
-		model.put("tables", tables);
-		return TemplateUtil.processTemplate("script/table_gen_script.ftl", model);
+		return null;
 	}
 	
 	/**
