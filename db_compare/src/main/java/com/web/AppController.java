@@ -256,7 +256,7 @@ public class AppController {
 		}else{
 			// 查询列信息
 			List<Map<String, Object>> cols = DbUtil.query("SELECT COLUMN_NAME,COLUMN_TYPE,COLUMN_SIZE FROM "
-					+ "DB_DETAIL WHERE VERSION_ID = ? AND TABLE_NAME = ? ORDER BY ID DESC", vId, id);
+					+ "DB_DETAIL WHERE VERSION_ID = ? AND TABLE_NAME = ? ORDER BY ID", vId, id);
 			for(Map<String, Object> col : cols){
 				Map<String, Object> node = new HashMap<String, Object>();
 				String name = (String)col.get("COLUMN_NAME");
@@ -522,7 +522,7 @@ public class AppController {
 		List<Object> moreTables = DbUtil.queryOnes(buf.toString(), srcId, tarId);
 		StringBuilder results = new StringBuilder();
 		String sql = "SELECT TABLE_NAME,COLUMN_NAME,COLUMN_TYPE,COLUMN_SIZE FROM DB_DETAIL "
-				+ "WHERE VERSION_ID = ? AND TABLE_NAME = ? ORDER BY ID DESC";
+				+ "WHERE VERSION_ID = ? AND TABLE_NAME = ? ORDER BY ID";
 		String type = (String)DbUtil.queryOne("SELECT TYPE FROM DB WHERE ID = (SELECT DB_ID FROM"
 				+ " VERSION WHERE ID = ?)", srcId);
 		if(moreTables != null && moreTables.size() > 0){
