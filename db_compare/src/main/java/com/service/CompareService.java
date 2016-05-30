@@ -34,6 +34,7 @@ import com.domain.ColumnInfo;
 import com.util.ColMapUtil;
 import com.util.DbUtil;
 import com.util.SpringUtil;
+import com.util.StringUtil;
 import com.util.TemplateUtil;
 
 /**
@@ -338,18 +339,10 @@ public class CompareService {
 		};
 		// 表名,列名,类型,大小
 		while((line = br.readLine()) != null){
-			line = line.trim().replaceAll("\"", ""); // 去掉双引号
-			String[] tmps = line.split(",");
-			if(tmps.length < 4){
+			ColumnInfo col = parseColumnInfo(line);
+			if(col == null){
 				continue;
 			}
-			ColumnInfo col = new ColumnInfo();
-			col.setTableName(tmps[0].trim());
-			col.setName(tmps[1].trim());
-			col.setType(tmps[2].trim());
-			try{
-				col.setSize(Integer.parseInt(tmps[3]));
-			}catch(Exception e){}
 			list.add(col);
 			if(list.size() >= 1000){
 				jdbcTemplate.batchUpdate(sql, list, 100, setter);
@@ -359,5 +352,73 @@ public class CompareService {
 		if(list.size() > 0){
 			jdbcTemplate.batchUpdate(sql, list, 100, setter);
 		}
+	}
+	
+	/**
+	 * 处理上传表
+	 * @author cxxyjsj
+	 * @date 2016年5月30日 下午9:21:55
+	 * @param is
+	 * @param dbId
+	 * @param descr
+	 * @throws Exception
+	 */
+	public void handleUploadTable(InputStream is, String vId, String type)throws Exception {
+		BufferedReader br = new BufferedReader(new InputStreamReader(is, Charset.forName("UTF-8")));
+		String line = br.readLine(); // 去掉标题行
+		List<ColumnInfo> list = new ArrayList<ColumnInfo>(1000);
+		String sql = "INSERT INTO DB_DETAIL(VERSION_ID,TABLE_NAME,COLUMN_NAME,COLUMN_TYPE,COLUMN_SIZE) VALUES (?,?,?,?,?)";
+		ParameterizedPreparedStatementSetter<ColumnInfo> setter = 
+				new ParameterizedPreparedStatementSetter<ColumnInfo>() {
+			@Override
+			public void setValues(PreparedStatement pstmt, ColumnInfo column) throws SQLException {
+				pstmt.setObject(1, vId);
+				pstmt.setObject(2, column.getTableName());
+				pstmt.setObject(3, column.getName());
+				pstmt.setObject(4, column.getType());
+				pstmt.setObject(5, column.getSize());
+			}
+		};
+		// 表名,列名,类型,大小
+		List<String> tableNames = new ArrayList<>();
+		while((line = br.readLine()) != null){
+			ColumnInfo col = parseColumnInfo(line);
+			if(col == null){
+				continue;
+			}
+			list.add(col);
+			if(!tableNames.contains(col.getTableName())){
+				tableNames.add(col.getTableName());
+			}
+		}
+		// 移除已存在的表
+		if(tableNames.size() > 0){
+			DbUtil.execute("DELETE FROM DB_DETAIL WHERE VERSION_ID = ? AND TABLE_NAME IN(" 
+					+ StringUtil.joinSql(tableNames.toArray(new String[0])) + ")", vId);
+		}
+		jdbcTemplate.batchUpdate(sql, list, 100, setter);
+	}
+	
+	/**
+	 * 
+	 * @author cxxyjsj
+	 * @date 2016年5月30日 下午9:25:31
+	 * @param line
+	 * @return
+	 */
+	private ColumnInfo parseColumnInfo(String line){
+		line = line.trim().replaceAll("\"", ""); // 去掉双引号
+		String[] tmps = line.split(",");
+		if(tmps.length < 4){
+			return null;
+		}
+		ColumnInfo col = new ColumnInfo();
+		col.setTableName(tmps[0].trim());
+		col.setName(tmps[1].trim());
+		col.setType(tmps[2].trim());
+		try{
+			col.setSize(Integer.parseInt(tmps[3]));
+		}catch(Exception e){}
+		return col;
 	}
 }

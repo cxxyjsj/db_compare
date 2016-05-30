@@ -329,6 +329,27 @@ public class AppController {
 	}
 	
 	/**
+	 * 上传表
+	 * @author cxxyjsj
+	 * @date 2016年5月30日 下午9:21:23
+	 * @param file
+	 * @param DB_ID
+	 * @param request
+	 * @return
+	 * @throws Exception
+	 */
+	@RequestMapping("/version/uploadTable")
+	public @ResponseBody Map<String, Object> uploadTable(@RequestParam("file") MultipartFile file,
+			@RequestParam String vId,@RequestParam String type, HttpServletRequest request)throws Exception {
+		InputStream is = file.getInputStream();
+		compareService.handleUploadTable(is, vId, type);
+		is.close();
+		Map<String, Object> result = new HashMap<String, Object>();
+		result.put("success", true);
+		return result;
+	}
+	
+	/**
 	 * 进入比较页面
 	 * @param model
 	 * @return

@@ -225,6 +225,58 @@ var version = {
 			   }
 			}
 		});
+		$("[op='view_import']").click(function(){
+			// 导入表
+			var vId = $("#version_view").attr("mid");
+			$.dialog({
+				title : '导入数据表',
+				large : true,
+				content : $("#import_template").html(),
+				beforeShow : function(){
+					var $dialog = this;
+					var $file = $("<input type='file' name='file' id='file'>");
+					$dialog.find("#fileArea").append($file);
+					$file.uploadify({
+						auto          : false,
+						multi         : false,
+						uploadLimit   : 1,
+						fileTypeExts  : "*.txt;*.csv",
+						fileTypeDesc  : "文本文件",
+						height        : 30,
+						buttonText    : '选择文件',
+						fileObjName   : 'file',
+						swf           : '/uploadify/uploadify.swf',
+						uploader      : basePath + '/version/uploadTable',
+						width         : 120,
+						onUploadStart : function(file){
+							var data = {
+								'vId' : vId,
+								'type' : $dialog.find("[name='TYPE']").val()
+							}
+							$file.uploadify("settings", "formData", data);
+						},
+						onUploadSuccess : function(){
+							$.msg("上传成功",function(){
+								location.reload();
+							});
+						}
+					});
+				},
+				callback : function(op){
+					if(op == "ok"){
+						var $file = this.find("#file");
+						var $uploadify = $file.data("uploadify");
+						if($uploadify.queueData.filesQueued < 1){
+							$.alert("请选择文件");
+							return false;
+						}
+						$("body").showLoading();
+						this.find("#file").uploadify("upload");
+						return false;
+					}
+				}
+			});
+		});
 	},
 	genAppScript : function(menu){
 		var $tree = $("#tree");

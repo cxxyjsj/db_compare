@@ -3,6 +3,9 @@
 		<div class="panel panel-default">
 			<div class="panel-heading">
 				${version.NAME}(${version.CREATE_DATE})
+				<div class="pull-right">
+			  		<a href="javascript:;" class="btn btn-info" op="view_import" style="position:absolute;right:20px;top:4px;">导入表</a>
+			  	</div>
 			</div>
 			<div class="panel-body">
 				<div class="input-group" style="margin-bottom:10px;">
@@ -40,6 +43,25 @@
 			</div>
 		</div>
 	</div>
+</div>
+<div class="template" id="import_template">
+	<form>
+	    <div class="form-group">
+	        <label>导入策略</label>
+	        <select class="form-control validate[required]" name="TYPE">
+	        	<option value="1">覆盖</option>
+	        	<option value="2">合并</option>
+	        </select>
+	    </div>
+	    <div class="form-group" id="fileArea">
+	    	<label>选择文件</label>
+	    </div>
+    </form>
+    <div class="alert alert-success" role="alert">
+    <strong>PLSQL导出的CSV格式文件:</strong><br/>
+      	Oracle查询语句: SELECT TABLE_NAME,COLUMN_NAME,DATA_TYPE,DATA_LENGTH FROM USER_TAB_COLUMNS WHERE TABLE_NAME = ? ORDER BY COLUMN_ID;
+ <br />
+    </div>
 </div>
 <script>
 	version.viewInit();
