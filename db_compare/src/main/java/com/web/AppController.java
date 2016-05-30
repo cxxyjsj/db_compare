@@ -553,7 +553,7 @@ public class AppController {
 			@PathVariable String appId)throws Exception {
 		String results = compareService.genAppScript(vId, appId);
 	 	HttpHeaders headers = new HttpHeaders();    
-        String fileName= appId + "-ddl.sql";
+        String fileName= appId + "-ddl.xml";
         headers.setContentDispositionFormData("attachment", fileName);   
         headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
         return new ResponseEntity<byte[]>(results.toString().getBytes(Charset.forName("UTF-8")), headers, HttpStatus.CREATED);    
@@ -573,7 +573,7 @@ public class AppController {
 			@PathVariable String tableName)throws Exception {
 		String results = compareService.genTableScript(vId, tableName);
 	 	HttpHeaders headers = new HttpHeaders();    
-        String fileName= tableName + "-ddl.sql";
+        String fileName= tableName + "-ddl.xml";
         headers.setContentDispositionFormData("attachment", fileName);   
         headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
         return new ResponseEntity<byte[]>(results.toString().getBytes(Charset.forName("UTF-8")), headers, HttpStatus.CREATED);    
