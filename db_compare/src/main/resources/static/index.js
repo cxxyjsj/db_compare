@@ -189,6 +189,11 @@ var version = {
 							icon : "fa fa-leaf",
 							action : version.genTableScript
 						});
+						actions.push({
+							label : "更改分组",
+							icon : "fa fa-cogs",
+							action : version.changeGroup
+						});
 					}
 					cb(actions);
 				}
@@ -294,6 +299,42 @@ var version = {
 			var tableName = node.id;
 			var vid = $("#version_view").attr("mid");
 			window.open(basePath + "/gen_table_script/" + vid + "/" + tableName);
+		}
+	},
+	changeGroup : function(menu){
+		var $tree = $("#tree");
+		var node = $tree.jstree("get_node",menu.reference);
+		if(node){
+			var tableName = node.id;
+			var curAppId = node.parent;
+			var appIds = $tree.jstree("get_node","_ROOT").children;
+			var html = '<select class="form-control">';
+			for(var i=0;i<appIds.length;i++){
+				if(appIds[i] == curAppId){
+					continue;
+				}
+				html += '<option value="' + appIds[i] + '">' + $tree.jstree("get_text",appIds[i]) + '</option>';
+			}
+			html += '</select>';
+			$.dialog({
+				title : '选择应用',
+				small : true,
+				content : html,
+				callback : function(op){
+					if(op == "ok"){
+						var appId = this.find("select").val();
+						$.post(basePath + "/app/change/" + appId + "/" + tableName, function(resp){
+							if(resp.success){
+								$.msg("更改成功",function(){
+									location.reload();
+								});
+							}else{
+								$.alert(resp.msg || "更改失败");
+							}
+						});
+					}
+				}
+			});
 		}
 	},
 	import : function(){

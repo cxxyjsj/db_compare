@@ -645,6 +645,28 @@ public class AppController {
 	}
 	
 	/**
+	 * 更改应用表
+	 * @author cxxyjsj
+	 * @date 2016年5月30日 下午10:26:30
+	 * @param appId
+	 * @param tableName
+	 * @return
+	 * @throws Exception
+	 */
+	@RequestMapping("/app/change/{appId}/{tableName}")
+	public @ResponseBody Map<String, Object> changeAppTable(@PathVariable String appId, @PathVariable String tableName)throws Exception {
+		Map<String, Object> retVal = new HashMap<>();
+		int cnt = DbUtil.queryInt("SELECT COUNT(*) FROM APP_TABLE WHERE APP_NAME = ? AND TABLE_NAME = ?", appId, tableName);
+		if(cnt < 1){
+			DbUtil.execute("INSERT INTO APP_TABLE(APP_NAME,TABLE_NAME) VALUES (?,?)", appId,tableName);
+		}else{
+			DbUtil.execute("UPDATE APP_TABLE SET APP_NAME = ? WHERE TABLE_NAME = ?", appId, tableName);
+		}
+		retVal.put("success", true);
+		return retVal;
+	}
+	
+	/**
 	 * 添加应用表
 	 * @author cxxyjsj
 	 * @date 2016年5月29日 下午2:27:32
