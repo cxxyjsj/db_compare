@@ -212,19 +212,23 @@ var version = {
 				   // 显示匹配的节点
 				   var data = $tree.data("jstree")._model.data;
 				   text = text.toLowerCase();
+				   var pars = [];
 				   for(var name in data){
 					   if(name == "#" || name == "_ROOT"){
 						   continue;
 					   }
 					   var node = data[name];
-					   if(name.toLowerCase().indexOf(text) >= 0){
+					   if(node.text.toLowerCase().indexOf(text) >= 0){
 						   $tree.jstree("show_node",name,true);
 						   if(node.parent){
-							   $tree.jstree("show_node",node.parent,true);
+							   pars.push(node.parent);
 						   }
 					   }else{
 						   $tree.jstree("hide_node",name,true);
 					   }
+				   }
+				   for(var i=0;i<pars.length;i++){
+					   $tree.jstree("show_node",pars[i],true);
 				   }
 				   $tree.jstree("redraw",true);
 			   }
@@ -520,19 +524,23 @@ var app = {
 				   // 显示匹配的节点
 				   var data = $tree.data("jstree")._model.data;
 				   text = text.toLowerCase();
+				   var pars = [];
 				   for(var name in data){
 					   var node = data[name];
 					   if(name == "#" || name == "_ROOT"){
 						   continue;
 					   }
-					   if(name.toLowerCase().indexOf(text) >= 0){
+					   if(node.text.toLowerCase().indexOf(text) >= 0){
 						   $tree.jstree("show_node",name,true);
 						   if(node.parent){
-							   $tree.jstree("show_node",node.parent,true);
+							   pars.push(node.parent);
 						   }
 					   }else{
 						   $tree.jstree("hide_node",name,true);
 					   }
+				   }
+				   for(var i=0;i<pars.length;i++){
+					   $tree.jstree("show_node",pars[i],true);
 				   }
 				   $tree.jstree("redraw",true);
 			   }
