@@ -8,7 +8,6 @@
     <tr>
       <th>数据库编码</th>
       <th>数据库名称</th>
-      <th>版本说明</th>
       <th>备份时间</th>
       <th>备份数</th>
       <th>操作</th>
@@ -20,7 +19,6 @@
   	<tr mid="${v.ID}">
       <td>${v.DB_CODE}</th>
       <td>${v.DB_NAME}</td>
-      <td>${v.DESCR}</td>
       <td>${v.CREATE_DATE}</td>
       <td>表:${v.TABLE_COUNT} | 列:${v.TOTAL_COUNT}</td>
       <td>
@@ -31,7 +29,7 @@
   	</#list>
   	<#else>
   	<tr>
-  		<td colspan="6" style="text-align:center;">暂无数据...</td>
+  		<td colspan="5" style="text-align:center;">暂无数据...</td>
   	</tr>
   	</#if>
   </tbody>
@@ -49,10 +47,6 @@
 	        	</#if>
 	        </select>
 	    </div>
-	    <div class="form-group">
-	        <label>版本说明</label>
-	        <textarea class="form-control" name="DESCR"></textarea>
-	    </div>
     </form>
 </div>
 <div class="template" id="import_template">
@@ -66,10 +60,6 @@
 	        	</#list>
 	        	</#if>
 	        </select>
-	    </div>
-	    <div class="form-group">
-	        <label>版本说明</label>
-	        <textarea class="form-control" name="DESCR"></textarea>
 	    </div>
 	    <div class="form-group" id="fileArea">
 	    	<label>选择文件</label>

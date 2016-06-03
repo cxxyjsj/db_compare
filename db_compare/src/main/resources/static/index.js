@@ -364,8 +364,7 @@ var version = {
 					width         : 120,
 					onUploadStart : function(file){
 						var data = {
-							'DB_ID' : $dialog.find("[name='DB_ID']").val(),
-							'DESCR' : $dialog.find("[name='DESCR']").val()
+							'DB_ID' : $dialog.find("[name='DB_ID']").val()
 						}
 						$file.uploadify("settings", "formData", data);
 					},
