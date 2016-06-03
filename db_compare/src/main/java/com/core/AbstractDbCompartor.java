@@ -49,7 +49,7 @@ public abstract class AbstractDbCompartor implements IDbCompartor {
 			ColumnInfo col = cols.get(i);
 			pw.append("\t").append(col.getName()).append(" ").append(col.getType());
 			String type = col.getType();
-			if(!"CLOB".equals(type) && !"BLOB".equals(type) && col.getSize() > 0){
+			if(!"DATE".equals(type) && !"CLOB".equals(type) && !"BLOB".equals(type) && col.getSize() > 0){
 				pw.append("(").append(col.getSize() + "").append(")");
 			}
 			if("WID".equals(col.getName())){
