@@ -504,7 +504,7 @@ public class AppController {
 		PrintWriter pw = new PrintWriter(sw);
 		// 获取两个版本中所有表结构变动. 只针对目标表进行新增和修改操作
 		String sql = "SELECT TABLE_NAME,COLUMN_NAME,COLUMN_TYPE,COLUMN_SIZE FROM DB_DETAIL "
-				+ "WHERE VERSION_ID = ? AND TABLE_NAME = ?";
+				+ "WHERE VERSION_ID = ? AND TABLE_NAME = ? ORDER BY ID";
 		String type = (String)DbUtil.queryOne("SELECT TYPE FROM DB WHERE ID = (SELECT DB_ID FROM"
 				+ " VERSION WHERE ID = ?)", tarId);
 		for(String tableName : diffTables){
