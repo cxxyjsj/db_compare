@@ -611,7 +611,9 @@ var app = {
 }
 
 $(function(){
-	$.initRouter($("#page-wrapper"),function(){
+	$.initRouter($("#page-wrapper"),function(path){
 		this.append('<div style="clear:both;"></div>');
+		$("#side-menu a").removeClass("active");
+		$("#side-menu [href='#" + path + "']").addClass("active");
 	});
 });

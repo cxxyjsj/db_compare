@@ -31,16 +31,16 @@
                 <div class="sidebar-nav navbar-collapse">
                     <ul class="nav in" id="side-menu">
                     	<li>
-                            <a href="#db" class="active"><i class="fa fa-wrench fa-fw"></i>数据库配置</a>
+                            <a href="#db"><i class="fa fa-wrench fa-fw"></i>数据库配置</a>
                         </li>
                         <li>
-                            <a href="#version" class="active"><i class="fa fa-dashboard fa-fw"></i>版本生成</a>
+                            <a href="#version"><i class="fa fa-dashboard fa-fw"></i>版本生成</a>
                         </li>
                         <li>
-                            <a href="#compare" class="active"><i class="fa fa-bar-chart-o fa-fw"></i>数据库比较</a>
+                            <a href="#compare"><i class="fa fa-bar-chart-o fa-fw"></i>数据库比较</a>
                         </li>
                         <li>
-                            <a href="#app" class="active"><i class="fa fa-windows fa-fw"></i>应用维护</a>
+                            <a href="#app"><i class="fa fa-windows fa-fw"></i>应用维护</a>
                         </li>
                     </ul>
                 </div>
