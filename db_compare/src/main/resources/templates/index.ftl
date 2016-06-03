@@ -42,6 +42,9 @@
                         <li>
                             <a href="#app"><i class="fa fa-windows fa-fw"></i>应用维护</a>
                         </li>
+                        <li>
+                            <a href="#data"><i class="fa fa-save fa-fw"></i>数据监控</a>
+                        </li>
                     </ul>
                 </div>
             </div>

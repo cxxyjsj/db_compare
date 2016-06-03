@@ -761,4 +761,17 @@ public class AppController {
 		}
 		return datas;
 	}
+	
+	/**
+	 * 数据监控首页
+	 * @author cxxyjsj
+	 * @date 2016年6月3日 下午8:50:57
+	 * @param model
+	 * @return
+	 * @throws Exception
+	 */
+	@RequestMapping("/data")
+	public String data(ModelMap model)throws Exception {
+		return "data/index";
+	}
 }
