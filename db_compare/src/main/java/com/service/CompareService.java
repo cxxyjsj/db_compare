@@ -16,6 +16,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -299,7 +300,7 @@ public class CompareService {
 	 * @return
 	 */
 	private Map<String, ColumnInfo> convertMap(List<ColumnInfo> cols) {
-		Map<String, ColumnInfo> map = new HashMap<String, ColumnInfo>();
+		Map<String, ColumnInfo> map = new LinkedHashMap<String, ColumnInfo>();
 		for(ColumnInfo col : cols){
 			map.put(col.getName(), col);
 		}

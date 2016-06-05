@@ -7,6 +7,7 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -431,7 +432,7 @@ public class AppController {
 	public String compareTableDetail(ModelMap model,@PathVariable String tableName,@PathVariable String srcId,
 			@PathVariable String tarId)throws Exception {
 		String sql = "SELECT TABLE_NAME,COLUMN_NAME,COLUMN_TYPE,COLUMN_SIZE FROM DB_DETAIL "
-				+ "WHERE VERSION_ID = ? AND TABLE_NAME = ?";
+				+ "WHERE VERSION_ID = ? AND TABLE_NAME = ? ORDER BY ID";
 		
 		List<ColumnInfo> srcCols = DbUtil.queryColumns(sql, srcId,tableName);
 		List<ColumnInfo> tarCols = DbUtil.queryColumns(sql, tarId,tableName);
@@ -457,7 +458,7 @@ public class AppController {
 				}
 			}
 		}
-		Map<String, Map<String,Object>> map = new HashMap<String, Map<String,Object>>();
+		Map<String, Map<String,Object>> map = new LinkedHashMap<String, Map<String,Object>>();
 		for(int i=0;i<distCols.size();i++){
 			ColumnInfo col = distCols.get(i);
 			String name = col.getName();
