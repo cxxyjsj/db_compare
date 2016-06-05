@@ -773,6 +773,10 @@ public class AppController {
 	 */
 	@RequestMapping("/data")
 	public String data(ModelMap model)throws Exception {
+		// 查询需要数据监控的表信息
+		List<Map<String, Object>> datas = DbUtil.query("SELECT APP_NAME,TABLE_NAME "
+				+ "FROM APP_TABLE WHERE DATA = '1' ORDER BY APP_NAME,TABLE_NAME");
+		model.put("tables", datas);
 		return "data/index";
 	}
 }
