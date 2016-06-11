@@ -422,4 +422,61 @@ public class CompareService {
 		}catch(Exception e){}
 		return col;
 	}
+	
+	/**
+	 * 获取表数据
+	 * @author cxxyjsj
+	 * @date 2016年6月11日 下午3:05:57
+	 * @param dbId
+	 * @param sql
+	 * @return
+	 * @throws Exception
+	 */
+	public String getTableDataScript(String dbId, String tableName, String sql)throws Exception {
+		Connection conn = null;
+		try{
+			conn = DbUtil.getConn(dbId);
+			List<Map<String, Object>> datas = DbUtil.query(conn, sql);
+			if(datas != null && datas.size() > 0){
+				String[] names = datas.get(0).keySet().toArray(new String[0]);
+				StringBuilder buf = new StringBuilder();
+				buf.append("INSERT INTO ").append(tableName).append("(");
+				for(int i=0;i<names.length;i++){
+					buf.append(names[i]);
+					if(i < names.length - 1){
+						buf.append(",");
+					}
+				}
+				buf.append(") VALUES (");
+				String prefix = buf.toString();
+				List<String> sqls = new ArrayList<>(datas.size());
+				for(Map<String, Object> data : datas){
+					buf.setLength(0);
+					for(int i=0;i<names.length;i++){
+						buf.append("'").append(convertValue(data.get(names[i]))).append("'");
+						if(i < names.length - 1){
+							buf.append(",");
+						}
+					}
+					sqls.add(prefix + buf.toString() + ")");
+				}
+				Map<String, Object> model = new HashMap<>();
+				model.put("sqls", sqls);
+				return TemplateUtil.processTemplate("script/data_gen_script.ftl", model);
+			}
+		}finally {
+			DbUtil.closeJdbc(new Connection[]{conn}, null, null);
+		}
+		return "";
+	}
+	
+	private String convertValue(Object value){
+		String retVal = value == null ? "" : value.toString();
+		// 过滤掉oracle关键字符
+		retVal = retVal.replaceAll("'", "' || chr(39) || '");
+		retVal = retVal.replaceAll("&", "' || chr(38) || '");
+		// 过滤掉xml关键字符
+		retVal = retVal.replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll("\"", "&quot;");
+		return retVal;
+	}
 }

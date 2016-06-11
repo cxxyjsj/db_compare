@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
@@ -772,11 +773,105 @@ public class AppController {
 	 * @throws Exception
 	 */
 	@RequestMapping("/data")
-	public String data(ModelMap model)throws Exception {
+	public String data(ModelMap model,HttpSession session)throws Exception {
 		// 查询需要数据监控的表信息
-		List<Map<String, Object>> datas = DbUtil.query("SELECT APP_NAME,TABLE_NAME "
-				+ "FROM APP_TABLE WHERE DATA = '1' ORDER BY APP_NAME,TABLE_NAME");
+		List<Map<String, Object>> datas = DbUtil.query("SELECT ID,TABLE_NAME,SQL "
+				+ "FROM APP_TABLE_DATA ORDER BY TABLE_NAME");
 		model.put("tables", datas);
+		model.put("dbs", DbUtil.query("SELECT ID,CODE,NAME FROM DB ORDER BY ID"));
+		model.put("db", session.getAttribute("db"));
 		return "data/index";
+	}
+	
+	/**
+	 * 添加记录
+	 * @author cxxyjsj
+	 * @date 2016年6月11日 下午2:21:48
+	 * @return
+	 * @throws Exception
+	 */
+	@RequestMapping("/data/edit")
+	public @ResponseBody Object dataEdit()throws Exception {
+		Map<String, Object> data = HttpUtil.getParameterMap();
+		String tableName = (String)data.get("TABLE_NAME");
+		if(StringUtils.isEmpty(tableName)){
+			throw new Exception("表名不能为空");
+		}
+		String sql = (String)data.get("SQL");
+		if(StringUtils.isEmpty(sql)){
+			throw new Exception("SQL脚本不能为空");
+		}
+		tableName = tableName.trim().toUpperCase();
+		data.put("TABLE_NAME", tableName);
+		sql = sql.trim();
+		if(sql.endsWith(";")){
+			sql = sql.substring(0, sql.length() - 1);
+		}
+		data.put("SQL", sql);
+		String id = (String)data.get("ID");
+		if(StringUtils.isEmpty(id)){
+			// 判断表名是否重复
+			int cnt = DbUtil.queryInt("SELECT COUNT(*) FROM APP_TABLE_DATA WHERE TABLE_NAME = ?", tableName);
+			if(cnt > 0){
+				throw new Exception("表名已存在,请修改");
+			}
+		}
+		DbUtil.saveOrUpdate("APP_TABLE_DATA", data);
+		return Collections.singletonMap("success", true);
+	}
+	
+	/**
+	 * 删除数据
+	 * @author cxxyjsj
+	 * @date 2016年6月11日 下午2:39:21
+	 * @return
+	 * @throws Exception
+	 */
+	@RequestMapping("/data/del/{id}")
+	public @ResponseBody Object dataDel(@PathVariable String id)throws Exception {
+		DbUtil.execute("DELETE FROM APP_TABLE_DATA WHERE ID = ?", id);
+		return Collections.singletonMap("success", true);
+	}
+	
+	/**
+	 * 切换数据库
+	 * @author cxxyjsj
+	 * @date 2016年6月11日 下午2:55:43
+	 * @param id
+	 * @param session
+	 * @return
+	 * @throws Exception
+	 */
+	@RequestMapping("/data/chgDb/{id}")
+	public @ResponseBody Object dataChgDb(@PathVariable String id,HttpSession session)throws Exception {
+		Map<String, Object> db = DbUtil.queryRow("SELECT ID,NAME,CODE FROM DB WHERE ID = ?", id);
+		session.setAttribute("db", db);
+		return Collections.singletonMap("success", true);
+	}
+	
+	/**
+	 * 导出数据脚本
+	 * @author cxxyjsj
+	 * @date 2016年6月11日 下午3:35:56
+	 * @param db
+	 * @param id
+	 * @return
+	 * @throws Exception
+	 */
+	@RequestMapping("/data/export/{db}_{id}")
+	public ResponseEntity<byte[]> dataExport(@PathVariable String db,
+			@PathVariable String id)throws Exception {
+		Map<String, Object> data = DbUtil.queryRow("SELECT TABLE_NAME,SQL FROM APP_TABLE_DATA WHERE ID = ?", id);
+		if(data != null){
+			String tableName = (String)data.get("TABLE_NAME");
+			String sql = (String)data.get("SQL");
+			String fileName= tableName + "-data.xml";
+			HttpHeaders headers = new HttpHeaders();    
+	        headers.setContentDispositionFormData("attachment", fileName);   
+	        headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+	        String results = compareService.getTableDataScript(db, tableName, sql);
+	        return new ResponseEntity<byte[]>(results.toString().getBytes(Charset.forName("UTF-8")), headers, HttpStatus.CREATED);    
+		}
+	 	return null;
 	}
 }

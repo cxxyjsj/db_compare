@@ -610,6 +610,100 @@ var app = {
 	}
 }
 
+var data = {
+		edit : function(data){
+			$.dialog({
+				title : '数据表维护',
+				content : $("#data_template").html(),
+				beforeShow : function(){
+					var $form = this.find("form");
+					if(data){
+						for(var name in data){
+							$form.find("[name='" + name + "']").val(data[name] || '');
+						}
+					}
+					$form.validationEngine();
+				},
+				callback : function(op){
+					if(op == "ok"){
+						var $form = this.find("form");
+						if($form.validationEngine("validate")){
+							$.post(basePath + "/data/edit",$form.serialize(),function(resp){
+								if(resp.success){
+									$.msg("保存成功",function(){
+										location.reload();
+									});
+								}else{
+									$.alert(resp.msg || "保存失败");
+								}
+							});
+						}
+						return false;
+					}
+				}
+			});
+		},
+		init : function(){
+			$("[op='data_add']").click(function(){
+				data.edit();
+			});
+			$("[op='data_db']").click(function(){
+				$.dialog({
+					title : '选择数据库',
+					content : $("#db_template").html(),
+					callback : function(op){
+						if(op == "ok"){
+							var id = this.find("[name='ID']").val();
+							$.post(basePath + "/data/chgDb/" + id,function(resp){
+								if(resp.success){
+									$.msg("切换成功",function(){
+										location.reload();
+									});
+								}else{
+									$.alert(resp.msg || "切换失败");
+								}
+							});
+							return false;
+						}
+					}
+				});
+			});
+			$("#dataTable").on("click","[op='edit']",function(){
+				var $tr = $(this).closest("tr");
+				var $tds = $tr.find("td");
+				data.edit({
+					ID : $tr.attr("mid"),
+					TABLE_NAME : $.trim($tds.eq(0).text()),
+					SQL : $.trim($tds.eq(1).text())
+				});
+			}).on("click","[op='del']",function(){
+				var $tr = $(this).closest("tr");
+				var id = $tr.attr("mid");
+				if(id){
+					$.confirm("确定删除吗?",function(){
+						$.post(basePath + "/data/del/" + id, function(resp){
+								if(resp.success){
+									$.msg("删除成功",function(){
+										location.reload();
+									});
+								}else{
+									$.alert(resp.msg || "删除失败");
+								}
+						});
+					})
+				}
+			}).on("click","[op='export']",function(){
+				var db = $("#db").val();
+				if(!db){
+					$.alert("请先选择数据库");
+					return false;
+				}
+				var id = $(this).closest("tr").attr("mid");
+				window.open(basePath + "/data/export/" + db + "_" + id);
+			});
+		}
+}
+
 $(function(){
 	$.initRouter($("#page-wrapper"),function(path){
 		this.append('<div style="clear:both;"></div>');
