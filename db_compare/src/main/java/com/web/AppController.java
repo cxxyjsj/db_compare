@@ -35,6 +35,8 @@ import com.service.CompareService;
 import com.util.DbUtil;
 import com.util.HttpUtil;
 import com.util.JsonUtil;
+import com.util.StringUtil;
+import com.util.TemplateUtil;
 
 /**
  * 前端控制器
@@ -870,6 +872,42 @@ public class AppController {
 	        headers.setContentDispositionFormData("attachment", fileName);   
 	        headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
 	        String results = compareService.getTableDataScript(db, tableName, sql);
+	        return new ResponseEntity<byte[]>(results.toString().getBytes(Charset.forName("UTF-8")), headers, HttpStatus.CREATED);    
+		}
+	 	return null;
+	}
+	
+	/**
+	 * 批量导出
+	 * @author cxxyjsj
+	 * @date 2016年6月11日 下午4:10:59
+	 * @param db
+	 * @param id
+	 * @return
+	 * @throws Exception
+	 */
+	@RequestMapping("/data/batch_export/{db}/{ids}")
+	public ResponseEntity<byte[]> dataBatchExport(@PathVariable String db, @PathVariable String ids)throws Exception {
+		List<Map<String, Object>> datas = DbUtil.query("SELECT TABLE_NAME,SQL FROM APP_TABLE_DATA WHERE ID IN(" + StringUtil.joinSql(ids.split(",")) + ")");
+		if(datas != null && datas.size() > 0){
+			List<String> sqls = new ArrayList<>();
+			HttpHeaders headers = new HttpHeaders();    
+	        headers.setContentDispositionFormData("attachment", "data.xml");   
+	        headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+			for(Map<String, Object> data : datas){
+				String tableName = (String)data.get("TABLE_NAME");
+				String sql = (String)data.get("SQL");
+		        List<String> list = compareService.getTableDataSql(db, tableName, sql);
+		        if(list != null && list.size() > 0){
+		        	sqls.addAll(list);
+		        }
+			}
+			String results = "";
+			if(sqls.size() > 0){
+				Map<String, Object> model = new HashMap<>();
+				model.put("sqls", sqls);
+				results = TemplateUtil.processTemplate("script/data_gen_script.ftl", model);
+			}
 	        return new ResponseEntity<byte[]>(results.toString().getBytes(Charset.forName("UTF-8")), headers, HttpStatus.CREATED);    
 		}
 	 	return null;

@@ -668,6 +668,23 @@ var data = {
 					}
 				});
 			});
+			$("[op='data_batch_export']").click(function(){
+				var db = $("#db").val();
+				if(!db){
+					$.alert("请先选择数据库");
+					return false;
+				}
+				var ids = [];
+				$("#dataTable [name='chk']:checked").each(function(){
+					var $tr = $(this).closest("tr");
+					ids.push($tr.attr("mid"));
+				});
+				if(ids.length < 1){
+					$.alert("请选择数据表");
+					return false;
+				}
+				window.open(basePath + "/data/batch_export/" + db + "/" + ids.join(","));
+			});
 			$("#dataTable").on("click","[op='edit']",function(){
 				var $tr = $(this).closest("tr");
 				var $tds = $tr.find("td");
@@ -700,6 +717,12 @@ var data = {
 				}
 				var id = $(this).closest("tr").attr("mid");
 				window.open(basePath + "/data/export/" + db + "_" + id);
+			}).on("click","[name='chkAll']",function(){
+				var $table = $(this).closest("table");
+				$table.find("[name='chk']").prop("checked",this.checked);
+			}).on("click","[name='chk']",function(){
+				var $table = $(this).closest("table");
+				$table.find("[name='chkAll']").prop("checked",$table.find("[name='chk']:checked").length == $table.find("[name='chk']").length);
 			});
 		}
 }

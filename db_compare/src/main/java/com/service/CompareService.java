@@ -424,15 +424,16 @@ public class CompareService {
 	}
 	
 	/**
-	 * 获取表数据
+	 * 获取SQL脚本集合
 	 * @author cxxyjsj
-	 * @date 2016年6月11日 下午3:05:57
+	 * @date 2016年6月11日 下午4:14:43
 	 * @param dbId
+	 * @param tableName
 	 * @param sql
 	 * @return
 	 * @throws Exception
 	 */
-	public String getTableDataScript(String dbId, String tableName, String sql)throws Exception {
+	public List<String> getTableDataSql(String dbId, String tableName, String sql)throws Exception {
 		Connection conn = null;
 		try{
 			conn = DbUtil.getConn(dbId);
@@ -460,12 +461,29 @@ public class CompareService {
 					}
 					sqls.add(prefix + buf.toString() + ")");
 				}
-				Map<String, Object> model = new HashMap<>();
-				model.put("sqls", sqls);
-				return TemplateUtil.processTemplate("script/data_gen_script.ftl", model);
+				return sqls;
 			}
 		}finally {
 			DbUtil.closeJdbc(new Connection[]{conn}, null, null);
+		}
+		return null;
+	}
+	
+	/**
+	 * 获取表数据
+	 * @author cxxyjsj
+	 * @date 2016年6月11日 下午3:05:57
+	 * @param dbId
+	 * @param sql
+	 * @return
+	 * @throws Exception
+	 */
+	public String getTableDataScript(String dbId, String tableName, String sql)throws Exception {
+		List<String> sqls = getTableDataSql(dbId, tableName, sql);
+		if(sqls != null && sqls.size() > 0){
+			Map<String, Object> model = new HashMap<>();
+			model.put("sqls", sqls);
+			return TemplateUtil.processTemplate("script/data_gen_script.ftl", model);
 		}
 		return "";
 	}

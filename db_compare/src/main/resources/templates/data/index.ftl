@@ -1,6 +1,7 @@
 <div id="data_container">
 	<div class="btn-tools">
 		<a href="javascript:;" class="btn btn-primary" op="data_add">新增</a>
+		<a href="javascript:;" class="btn btn-warning" op="data_batch_export">批量导出</a>
 		<a href="javascript:;" class="btn btn-info" op="data_db">切换数据库</a>
 		<span style="color:red;">
 			<#if db??>
@@ -14,6 +15,9 @@
 	<table class="table table-bordered" id="dataTable">
 	  <thead>
 	    <tr>
+	      <th width="60px">
+	      	<input type="checkbox" name="chkAll">
+	      </th>
 	      <th>表名</th>
 	      <th>SQL片段</th>
 	      <th>操作</th>
@@ -23,6 +27,9 @@
 	  	<#if tables?size gt 0>
 	  	<#list tables as table>
 	  	<tr mid="${table.ID}">
+	  	  <td>
+	  	  	<input type="checkbox" name="chk">
+	  	  </td>
 	      <td>${table.TABLE_NAME}</th>
 	      <td>${table.SQL}</td>
 	      <td>
@@ -34,7 +41,7 @@
 	  	</#list>
 	  	<#else>
 	  	<tr>
-	  		<td colspan="3" style="text-align:center;">暂无数据...</td>
+	  		<td colspan="4" style="text-align:center;">暂无数据...</td>
 	  	</tr>
 	  	</#if>
 	  </tbody>
