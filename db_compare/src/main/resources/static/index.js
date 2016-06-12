@@ -690,8 +690,8 @@ var data = {
 				var $tds = $tr.find("td");
 				data.edit({
 					ID : $tr.attr("mid"),
-					TABLE_NAME : $.trim($tds.eq(0).text()),
-					SQL : $.trim($tds.eq(1).text())
+					TABLE_NAME : $.trim($tds.eq(1).text()),
+					SQL : $.trim($tds.eq(2).text())
 				});
 			}).on("click","[op='del']",function(){
 				var $tr = $(this).closest("tr");
