@@ -1,3 +1,8 @@
+<style>
+	.wrap {
+		    word-break: break-all;
+	}
+</style>
 <div id="data_container">
 	<div class="btn-tools">
 		<a href="javascript:;" class="btn btn-primary" op="data_add">新增</a>
@@ -31,7 +36,7 @@
 	  	  	<input type="checkbox" name="chk">
 	  	  </td>
 	      <td>${table.TABLE_NAME}</th>
-	      <td>${table.SQL}</td>
+	      <td class="wrap">${table.SQL}</td>
 	      <td>
 	      	<a href="javascript:;" class="btn btn-sm btn-primary" op="export">脚本</a>
 	      	<a href="javascript:;" class="btn btn-sm btn-info" op="edit">修改</a>
