@@ -276,6 +276,25 @@ public class DbUtil {
 	}
 
 	/**
+	 * 查询第一行第一列
+	 * @author cxxyjsj
+	 * @date 2016年6月12日 上午11:28:42
+	 * @param conn
+	 * @param sql
+	 * @param params
+	 * @return
+	 * @throws Exception
+	 */
+	public static Object queryOne(Connection conn,String sql, Object... params)throws Exception {
+		List<Map<String, Object>> datas = query(conn, sql, params);
+		if(datas != null && datas.size() > 0){
+			Map<String, Object> data = datas.get(0);
+			return data.entrySet().iterator().next().getValue();
+		}
+		return null;
+	}
+	
+	/**
 	 * 新增或修改操作,返回记录ID 判断标准:如果传入ID,则进行更新操作,否则进行修改操作
 	 * 
 	 * @author mengbin

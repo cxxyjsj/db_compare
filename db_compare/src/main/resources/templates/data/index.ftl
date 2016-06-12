@@ -26,7 +26,7 @@
 	  <tbody>
 	  	<#if tables?size gt 0>
 	  	<#list tables as table>
-	  	<tr mid="${table.ID}">
+	  	<tr mid="${table.ID}" type="${table.TYPE}">
 	  	  <td>
 	  	  	<input type="checkbox" name="chk">
 	  	  </td>
@@ -65,8 +65,15 @@
         <input class="form-control validate[required]" name="TABLE_NAME">
     </div>
     <div class="form-group">
+        <label>类型</label>
+        <select class="form-control validate[required]" name="TYPE">
+        	<option value="table">表</table>
+        	<option value="view">视图</table>
+        </select>
+    </div>
+    <div class="form-group">
         <label>SQL脚本</label>
-        <textarea class="form-control validate[required]" name="SQL" rows="10"></textarea>
+        <textarea class="form-control" name="SQL" rows="10"></textarea>
     </div>
 </form>
 </div>

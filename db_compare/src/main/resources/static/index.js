@@ -690,6 +690,7 @@ var data = {
 				var $tds = $tr.find("td");
 				data.edit({
 					ID : $tr.attr("mid"),
+					TYPE : $tr.attr("type"),
 					TABLE_NAME : $.trim($tds.eq(1).text()),
 					SQL : $.trim($tds.eq(2).text())
 				});

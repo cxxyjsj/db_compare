@@ -20,6 +20,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -433,35 +434,48 @@ public class CompareService {
 	 * @return
 	 * @throws Exception
 	 */
-	public List<String> getTableDataSql(String dbId, String tableName, String sql)throws Exception {
+	public List<String> getTableDataSql(String dbId, Map<String, Object> tableData)throws Exception {
 		Connection conn = null;
 		try{
+			String sql = (String)tableData.get("SQL");
+			String type = (String)tableData.get("TYPE");
+			String tableName = (String)tableData.get("TABLE_NAME");
 			conn = DbUtil.getConn(dbId);
-			List<Map<String, Object>> datas = DbUtil.query(conn, sql);
-			if(datas != null && datas.size() > 0){
-				String[] names = datas.get(0).keySet().toArray(new String[0]);
-				StringBuilder buf = new StringBuilder();
-				buf.append("INSERT INTO ").append(tableName).append("(");
-				for(int i=0;i<names.length;i++){
-					buf.append(names[i]);
-					if(i < names.length - 1){
-						buf.append(",");
-					}
+			if("view".equals(type)){
+				String str = (String)DbUtil.queryOne(conn,"SELECT TEXT FROM USER_VIEWS WHERE VIEW_NAME = ?", tableName);
+				if(!StringUtils.isEmpty(str)){
+					StringBuilder buf = new StringBuilder();
+					buf.append("<![CDATA[").append("CREATE VIEW ").append(tableName).append(" AS ")
+					      .append(str).append("]]>");
+					return Collections.singletonList(buf.toString());
 				}
-				buf.append(") VALUES (");
-				String prefix = buf.toString();
-				List<String> sqls = new ArrayList<>(datas.size());
-				for(Map<String, Object> data : datas){
-					buf.setLength(0);
+			}else if("table".equals(type)){
+				List<Map<String, Object>> datas = DbUtil.query(conn, sql);
+				if(datas != null && datas.size() > 0){
+					String[] names = datas.get(0).keySet().toArray(new String[0]);
+					StringBuilder buf = new StringBuilder();
+					buf.append("INSERT INTO ").append(tableName).append("(");
 					for(int i=0;i<names.length;i++){
-						buf.append("'").append(convertValue(data.get(names[i]))).append("'");
+						buf.append(names[i]);
 						if(i < names.length - 1){
 							buf.append(",");
 						}
 					}
-					sqls.add(prefix + buf.toString() + ")");
+					buf.append(") VALUES (");
+					String prefix = buf.toString();
+					List<String> sqls = new ArrayList<>(datas.size());
+					for(Map<String, Object> data : datas){
+						buf.setLength(0);
+						for(int i=0;i<names.length;i++){
+							buf.append("'").append(convertValue(names[i],data.get(names[i]))).append("'");
+							if(i < names.length - 1){
+								buf.append(",");
+							}
+						}
+						sqls.add(prefix + buf.toString() + ")");
+					}
+					return sqls;
 				}
-				return sqls;
 			}
 		}finally {
 			DbUtil.closeJdbc(new Connection[]{conn}, null, null);
@@ -478,8 +492,8 @@ public class CompareService {
 	 * @return
 	 * @throws Exception
 	 */
-	public String getTableDataScript(String dbId, String tableName, String sql)throws Exception {
-		List<String> sqls = getTableDataSql(dbId, tableName, sql);
+	public String getTableDataScript(String dbId, Map<String, Object> tableData)throws Exception {
+		List<String> sqls = getTableDataSql(dbId, tableData);
 		if(sqls != null && sqls.size() > 0){
 			Map<String, Object> model = new HashMap<>();
 			model.put("sqls", sqls);
@@ -488,7 +502,16 @@ public class CompareService {
 		return "";
 	}
 	
-	private String convertValue(Object value){
+	private String convertValue(String name, Object value){
+		if("TBRQ".equals(name) || "TBLB".equals(name) || "CZRQ".equals(name)){
+			return "";
+		}
+		if("CZZ".equals(name)){
+			return "ADMIN";
+		}
+		if("CZZXM".equals(name)){
+			return "管理员";
+		}
 		String retVal = value == null ? "" : value.toString();
 		// 过滤掉oracle关键字符
 		retVal = retVal.replaceAll("'", "' || chr(39) || '");

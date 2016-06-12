@@ -524,7 +524,7 @@ public class AppController {
         String fileName= "Database change.sql";
         headers.setContentDispositionFormData("attachment", fileName);   
         headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
-        return new ResponseEntity<byte[]>(results.getBytes(Charset.forName("UTF-8")), headers, HttpStatus.CREATED);    
+        return new ResponseEntity<byte[]>(results.getBytes(Charset.forName("GBK")), headers, HttpStatus.CREATED);    
 	}
 	
 	/**
@@ -561,7 +561,7 @@ public class AppController {
         String fileName= "Database create.sql";
         headers.setContentDispositionFormData("attachment", fileName);   
         headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
-        return new ResponseEntity<byte[]>(results.toString().getBytes(Charset.forName("UTF-8")), headers, HttpStatus.CREATED);    
+        return new ResponseEntity<byte[]>(results.toString().getBytes(Charset.forName("GBK")), headers, HttpStatus.CREATED);    
 	}
 	
 	/**
@@ -581,7 +581,7 @@ public class AppController {
         String fileName= appId + "-ddl.xml";
         headers.setContentDispositionFormData("attachment", fileName);   
         headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
-        return new ResponseEntity<byte[]>(results.toString().getBytes(Charset.forName("UTF-8")), headers, HttpStatus.CREATED);    
+        return new ResponseEntity<byte[]>(results.toString().getBytes(Charset.forName("GBK")), headers, HttpStatus.CREATED);    
 	}
 	
 	/**
@@ -601,7 +601,7 @@ public class AppController {
         String fileName= tableName + "-ddl.xml";
         headers.setContentDispositionFormData("attachment", fileName);   
         headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
-        return new ResponseEntity<byte[]>(results.toString().getBytes(Charset.forName("UTF-8")), headers, HttpStatus.CREATED);    
+        return new ResponseEntity<byte[]>(results.toString().getBytes(Charset.forName("GBK")), headers, HttpStatus.CREATED);    
 	}
 	
 	/**
@@ -777,8 +777,7 @@ public class AppController {
 	@RequestMapping("/data")
 	public String data(ModelMap model,HttpSession session)throws Exception {
 		// 查询需要数据监控的表信息
-		List<Map<String, Object>> datas = DbUtil.query("SELECT ID,TABLE_NAME,SQL "
-				+ "FROM APP_TABLE_DATA ORDER BY TABLE_NAME");
+		List<Map<String, Object>> datas = DbUtil.query("SELECT * FROM APP_TABLE_DATA ORDER BY TABLE_NAME");
 		model.put("tables", datas);
 		model.put("dbs", DbUtil.query("SELECT ID,CODE,NAME FROM DB ORDER BY ID"));
 		model.put("db", session.getAttribute("db"));
@@ -799,8 +798,13 @@ public class AppController {
 		if(StringUtils.isEmpty(tableName)){
 			throw new Exception("表名不能为空");
 		}
+		String type = (String)data.get("TYPE");
+		if(StringUtils.isEmpty(type)){
+			throw new Exception("类型不能为空");
+		}
+		data.put("TYPE",type);
 		String sql = (String)data.get("SQL");
-		if(StringUtils.isEmpty(sql)){
+		if("table".equals(type) && StringUtils.isEmpty(sql)){
 			throw new Exception("SQL脚本不能为空");
 		}
 		tableName = tableName.trim().toUpperCase();
@@ -863,16 +867,15 @@ public class AppController {
 	@RequestMapping("/data/export/{db}_{id}")
 	public ResponseEntity<byte[]> dataExport(@PathVariable String db,
 			@PathVariable String id)throws Exception {
-		Map<String, Object> data = DbUtil.queryRow("SELECT TABLE_NAME,SQL FROM APP_TABLE_DATA WHERE ID = ?", id);
+		Map<String, Object> data = DbUtil.queryRow("SELECT * FROM APP_TABLE_DATA WHERE ID = ?", id);
 		if(data != null){
 			String tableName = (String)data.get("TABLE_NAME");
-			String sql = (String)data.get("SQL");
 			String fileName= tableName + "-data.xml";
 			HttpHeaders headers = new HttpHeaders();    
 	        headers.setContentDispositionFormData("attachment", fileName);   
 	        headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
-	        String results = compareService.getTableDataScript(db, tableName, sql);
-	        return new ResponseEntity<byte[]>(results.toString().getBytes(Charset.forName("UTF-8")), headers, HttpStatus.CREATED);    
+	        String results = compareService.getTableDataScript(db, data);
+	        return new ResponseEntity<byte[]>(results.toString().getBytes(Charset.forName("GBK")), headers, HttpStatus.CREATED);    
 		}
 	 	return null;
 	}
@@ -888,16 +891,14 @@ public class AppController {
 	 */
 	@RequestMapping("/data/batch_export/{db}/{ids}")
 	public ResponseEntity<byte[]> dataBatchExport(@PathVariable String db, @PathVariable String ids)throws Exception {
-		List<Map<String, Object>> datas = DbUtil.query("SELECT TABLE_NAME,SQL FROM APP_TABLE_DATA WHERE ID IN(" + StringUtil.joinSql(ids.split(",")) + ")");
+		List<Map<String, Object>> datas = DbUtil.query("SELECT * FROM APP_TABLE_DATA WHERE ID IN(" + StringUtil.joinSql(ids.split(",")) + ")");
 		if(datas != null && datas.size() > 0){
 			List<String> sqls = new ArrayList<>();
 			HttpHeaders headers = new HttpHeaders();    
 	        headers.setContentDispositionFormData("attachment", "data.xml");   
 	        headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
 			for(Map<String, Object> data : datas){
-				String tableName = (String)data.get("TABLE_NAME");
-				String sql = (String)data.get("SQL");
-		        List<String> list = compareService.getTableDataSql(db, tableName, sql);
+		        List<String> list = compareService.getTableDataSql(db, data);
 		        if(list != null && list.size() > 0){
 		        	sqls.addAll(list);
 		        }
@@ -908,7 +909,7 @@ public class AppController {
 				model.put("sqls", sqls);
 				results = TemplateUtil.processTemplate("script/data_gen_script.ftl", model);
 			}
-	        return new ResponseEntity<byte[]>(results.toString().getBytes(Charset.forName("UTF-8")), headers, HttpStatus.CREATED);    
+	        return new ResponseEntity<byte[]>(results.toString().getBytes(Charset.forName("GBK")), headers, HttpStatus.CREATED);    
 		}
 	 	return null;
 	}
