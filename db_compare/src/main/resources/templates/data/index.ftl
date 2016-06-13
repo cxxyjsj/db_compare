@@ -2,6 +2,9 @@
 	.wrap {
 		    word-break: break-all;
 	}
+	.nowrap {
+		white-space: nowrap;
+	}
 </style>
 <div id="data_container">
 	<div class="btn-tools">
@@ -37,7 +40,7 @@
 	  	  </td>
 	      <td>${table.TABLE_NAME}</th>
 	      <td class="wrap">${table.SQL}</td>
-	      <td>
+	      <td class="nowrap">
 	      	<a href="javascript:;" class="btn btn-sm btn-primary" op="export">脚本</a>
 	      	<a href="javascript:;" class="btn btn-sm btn-info" op="edit">修改</a>
 	      	<a href="javascript:;" class="btn btn-sm btn-danger" op="del">删除</a>
