@@ -502,7 +502,7 @@ public class CompareService {
 		return "";
 	}
 	
-	private String convertValue(String name, Object value){
+	public String convertValue(String name, Object value){
 		if("TBRQ".equals(name) || "TBLB".equals(name) || "CZRQ".equals(name)){
 			return "";
 		}

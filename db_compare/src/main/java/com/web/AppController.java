@@ -913,4 +913,43 @@ public class AppController {
 		}
 	 	return null;
 	}
+	
+	/**
+	 * 进入转义应用
+	 * @author cxxyjsj
+	 * @date 2016年6月14日 下午6:42:31
+	 * @param model
+	 * @param session
+	 * @return
+	 * @throws Exception
+	 */
+	@RequestMapping("/escape")
+	public String escape(ModelMap model)throws Exception {
+		return "escape/index";
+	}
+	
+	/**
+	 * 转义SQL
+	 * @author cxxyjsj
+	 * @date 2016年6月14日 下午7:06:04
+	 * @return
+	 * @throws Exception
+	 */
+	@RequestMapping("/escape/sql")
+	public @ResponseBody Map<String, Object> escapeSql(@RequestParam String sql)throws Exception {
+		Map<String, Object> retVal = new HashMap<>();
+		sql = sql.replaceAll("\r|\n", " ");
+		String[] sqls = sql.split("\\);");
+		StringBuilder buf = new StringBuilder();
+		for(String str : sqls){
+			if("".equals(str.trim())){
+				continue;
+			}
+			str = str + ")";
+			buf.append("<data>").append(compareService.convertValue(null, str)).append("</data>").append("\n");
+		}
+		retVal.put("success", true);
+		retVal.put("data", buf.toString());
+		return retVal;
+	}
 }

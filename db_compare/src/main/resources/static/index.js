@@ -728,6 +728,24 @@ var data = {
 		}
 }
 
+var escape = {
+		init : function(){
+			$("#escapeBtn").click(function(){
+				var src = $("#src").val();
+				if(!src){
+					return;
+				}
+				$.post(basePath + "/escape/sql",{sql : src},function(resp){
+					if(resp.success){
+						$("#target").val(resp.data);
+					}else{
+						$.alert(resp.msg || "转换失败");
+					}
+				});
+			});
+		}
+}
+
 $(function(){
 	$.initRouter($("#page-wrapper"),function(path){
 		this.append('<div style="clear:both;"></div>');

@@ -44,6 +44,11 @@
                         </li>
                         <li>
                             <a href="#data"><i class="fa fa-save fa-fw"></i>数据监控</a>
+                            <ul class="nav nav-second-level">
+                                <li>
+                                    <a href="#escape">脚本转义</a>
+                                </li>
+                            </ul>
                         </li>
                     </ul>
                 </div>
