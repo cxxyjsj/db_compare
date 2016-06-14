@@ -946,7 +946,8 @@ public class AppController {
 				continue;
 			}
 			str = str + ")";
-			buf.append("<data>").append(compareService.convertValue(null, str)).append("</data>").append("\n");
+			str = str.replaceAll("&", "' || chr(38) || '").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll("\"", "&quot;");
+			buf.append("<data>").append(str).append("</data>").append("\n");
 		}
 		retVal.put("success", true);
 		retVal.put("data", buf.toString());
