@@ -743,6 +743,40 @@ var escape = {
 					}
 				});
 			});
+			$("#dbBtn").click(function(){
+				$.dialog({
+					title : '选择数据库',
+					content : $("#db_template").html(),
+					callback : function(op){
+						if(op == "ok"){
+							var id = this.find("[name='ID']").val();
+							$.post(basePath + "/data/chgDb/" + id,function(resp){
+								if(resp.success){
+									$.msg("切换成功",function(){
+										location.reload();
+									});
+								}else{
+									$.alert(resp.msg || "切换失败");
+								}
+							});
+							return false;
+						}
+					}
+				});
+			});
+			$("#genBtn").click(function(){
+				var tableName = $("#tableName").val();
+				if(!tableName){
+					return;
+				}
+				$.post(basePath + "/genTable/" + tableName,function(resp){
+					if(resp.success){
+						$("#target").val(resp.data);
+					}else{
+						$.alert(resp.msg || "生成失败");
+					}
+				});
+			});
 		}
 }
 

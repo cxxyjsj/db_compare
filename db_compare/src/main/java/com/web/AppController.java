@@ -4,6 +4,7 @@ import java.io.InputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.nio.charset.Charset;
+import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -32,6 +33,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.domain.ColumnInfo;
 import com.service.CompareService;
+import com.util.ColMapUtil;
 import com.util.DbUtil;
 import com.util.HttpUtil;
 import com.util.JsonUtil;
@@ -951,6 +953,69 @@ public class AppController {
 		}
 		retVal.put("success", true);
 		retVal.put("data", buf.toString());
+		return retVal;
+	}
+	
+	/**
+	 * 生成表结构
+	 * @author cxxyjsj
+	 * @date 2016年6月14日 下午8:36:07
+	 * @param model
+	 * @return
+	 * @throws Exception
+	 */
+	@RequestMapping("/genTable")
+	public String genTable(ModelMap model,HttpSession session)throws Exception {
+		model.put("dbs", DbUtil.query("SELECT ID,CODE,NAME FROM DB ORDER BY ID"));
+		model.put("db", session.getAttribute("db"));
+		return "escape/genTable";
+	}
+	
+	/**
+	 * 生成表结构脚本
+	 * @author cxxyjsj
+	 * @date 2016年6月14日 下午8:48:41
+	 * @param tableName
+	 * @return
+	 * @throws Exception
+	 */
+	@RequestMapping("/genTable/{tableName}")
+	public @ResponseBody Map<String, Object> genTableScript(@PathVariable String tableName,HttpSession session)throws Exception {
+		Map<String, Object> retVal = new HashMap<>();
+		Map<String, Object> db =  (Map<String, Object>)session.getAttribute("db");
+		if(db == null){
+			throw new Exception("请先选择数据库");
+		}
+		tableName = tableName.toUpperCase();
+		String dbId = String.valueOf(db.get("ID").toString());
+		Connection conn = DbUtil.getConn(dbId);
+		try{
+			List<Map<String, Object>> cols = DbUtil.query(conn, "SELECT COLUMN_NAME,DATA_TYPE,DATA_LENGTH FROM USER_TAB_COLUMNS "
+					+ "WHERE TABLE_NAME = ? ORDER BY COLUMN_ID", tableName);
+			if(cols != null && cols.size() > 0){
+				Map<String, Object> table = new HashMap<>();
+				table.put("NAME", tableName);
+				for(Map<String, Object> col : cols){
+					String colName = (String)col.remove("COLUMN_NAME");
+					String colType = (String)col.remove("DATA_TYPE");
+					int colSize = Integer.valueOf(col.remove("DATA_LENGTH").toString());
+					col.put("NAME", colName);
+					String tType = ColMapUtil.getScriptType(colType); // 获取目标类型
+					if(!"DATE".equals(colType) && !"CLOB".equals(colType) && !"BLOB".equals(colType) && colSize > 0){
+						tType += "(" + colSize + ")";
+					}
+					col.put("TYPE", tType);
+				}
+				table.put("cols", cols);
+				Map<String, Object> model = new HashMap<>();
+				model.put("tables", Collections.singletonList(table));
+				String data = TemplateUtil.processTemplate("script/table_gen_script.ftl", model);
+				retVal.put("data", data);
+				retVal.put("success", true);
+			}
+		}finally{
+			conn.close();
+		}
 		return retVal;
 	}
 }
