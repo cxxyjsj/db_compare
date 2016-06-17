@@ -34,7 +34,11 @@ public class ColMapUtil {
 		}
 	}
 	
-	public static String getScriptType(String type) {
-		return MAPPING.get(type);
+	public static String getScriptType(String type,int size) {
+		String str = MAPPING.get(type);
+		if("double".equals(str) && size < 10){
+			return "int";
+		}
+		return str;
 	}
 }
