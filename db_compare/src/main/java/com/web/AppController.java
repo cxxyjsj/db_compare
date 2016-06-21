@@ -990,8 +990,8 @@ public class AppController {
 		String dbId = String.valueOf(db.get("ID").toString());
 		Connection conn = DbUtil.getConn(dbId);
 		try{
-			List<Map<String, Object>> cols = DbUtil.query(conn, "SELECT COLUMN_NAME,DATA_TYPE,DATA_LENGTH FROM USER_TAB_COLUMNS "
-					+ "WHERE TABLE_NAME = ? ORDER BY COLUMN_ID", tableName);
+			List<Map<String, Object>> cols = DbUtil.query(conn, "SELECT COLUMN_NAME,DATA_TYPE,NVL(DATA_PRECISION,DATA_LENGTH) AS DATA_LENGTH"
+					+ " FROM USER_TAB_COLUMNS WHERE TABLE_NAME = ? ORDER BY COLUMN_ID", tableName);
 			if(cols != null && cols.size() > 0){
 				Map<String, Object> table = new HashMap<>();
 				table.put("NAME", tableName);
