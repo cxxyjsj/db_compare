@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="GBK"?>
 <dbVersion>
 	<#list sqls as sql>
-<data>
+	<data>
 	${sql}
 	</data>
 	</#list>
