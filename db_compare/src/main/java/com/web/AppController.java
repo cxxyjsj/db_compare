@@ -940,14 +940,13 @@ public class AppController {
 	@RequestMapping("/escape/sql")
 	public @ResponseBody Map<String, Object> escapeSql(@RequestParam String sql)throws Exception {
 		Map<String, Object> retVal = new HashMap<>();
-		sql = sql.replaceAll("\r|\n", " ");
-		String[] sqls = sql.split("\\);");
+		String[] sqls = sql.split(";");
 		StringBuilder buf = new StringBuilder();
 		for(String str : sqls){
-			if("".equals(str.trim())){
+			str = str.trim();
+			if("".equals(str)){
 				continue;
 			}
-			str = str + ")";
 			str = str.replaceAll("&", "' || chr(38) || '").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll("\"", "&quot;");
 			buf.append("<data>").append(str).append("</data>").append("\n");
 		}

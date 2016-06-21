@@ -9,7 +9,7 @@
 	        </div>
 	        <div class="panel-body">
 	            <div class="col-md-12">
-	            	<p>请输入insert SQL脚本,分号结尾</p>
+	            	<p>请输入SQL脚本,分号结尾</p>
 	            	<textarea id="src" class="form-control" rows="15"></textarea>
 	            </div>
 	            <div class="col-md-12">
