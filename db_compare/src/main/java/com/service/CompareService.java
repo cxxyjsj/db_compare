@@ -277,11 +277,7 @@ public class CompareService {
 						String type = (String)col.remove("COLUMN_TYPE");
 						int size = Integer.valueOf(col.remove("COLUMN_SIZE").toString());
 						col.put("NAME", name);
-						String tType = ColMapUtil.getScriptType(type,size); // 获取目标类型
-						if(!"DATE".equals(type) && !"CLOB".equals(type) && !"BLOB".equals(type) && size > 0){
-							tType += "(" + size + ")";
-						}
-						col.put("TYPE", tType);
+						col.put("TYPE", ColMapUtil.getScriptType(type,size));
 					}
 					table.put("cols", cols);
 				}

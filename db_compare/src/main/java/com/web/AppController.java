@@ -1000,11 +1000,7 @@ public class AppController {
 					String colType = (String)col.remove("DATA_TYPE");
 					int colSize = Integer.valueOf(col.remove("DATA_LENGTH").toString());
 					col.put("NAME", colName);
-					String tType = ColMapUtil.getScriptType(colType,colSize); // 获取目标类型
-					if(!"DATE".equals(colType) && !"CLOB".equals(colType) && !"BLOB".equals(colType) && colSize > 0){
-						tType += "(" + colSize + ")";
-					}
-					col.put("TYPE", tType);
+					col.put("TYPE", ColMapUtil.getScriptType(colType,colSize));
 				}
 				table.put("cols", cols);
 				Map<String, Object> model = new HashMap<>();

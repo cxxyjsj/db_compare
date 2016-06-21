@@ -35,10 +35,19 @@ public class ColMapUtil {
 	}
 	
 	public static String getScriptType(String type,int size) {
-		String str = MAPPING.get(type);
-		if("double".equals(str) && size < 10){
-			return "int";
+		if("NUMBER".equals(type)){
+			// 数字类型转换
+			if(size < 10){
+				return "int";
+			}else{
+				return "double";
+			}
+		}else{
+			String str = MAPPING.get(type);
+			if(!"DATE".equals(type) && !"CLOB".equals(type) && !"BLOB".equals(type) && size > 0){
+				str += "(" + size + ")";
+			}
+			return str;
 		}
-		return str;
 	}
 }
