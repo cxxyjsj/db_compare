@@ -11,6 +11,8 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -968,6 +970,57 @@ public class AppController {
 		model.put("dbs", DbUtil.query("SELECT ID,CODE,NAME FROM DB ORDER BY ID"));
 		model.put("db", session.getAttribute("db"));
 		return "escape/genTable";
+	}
+	
+	/**
+	 * 查询脚本生成
+	 * @author cxxyjsj
+	 * @date 2016年6月21日 下午5:43:30
+	 * @param model
+	 * @param session
+	 * @return
+	 * @throws Exception
+	 */
+	@RequestMapping("/genQuery")
+	public String genQuery(ModelMap model,HttpSession session)throws Exception {
+		model.put("dbs", DbUtil.query("SELECT ID,CODE,NAME FROM DB ORDER BY ID"));
+		model.put("db", session.getAttribute("db"));
+		return "escape/genQuery";
+	}
+	
+	@RequestMapping("/genQueryScript")
+	public @ResponseBody Map<String, Object> genQueryScript(@RequestParam String sql,HttpSession session)throws Exception {
+		Map<String, Object> retVal = new HashMap<>();
+		Map<String, Object> db =  (Map<String, Object>)session.getAttribute("db");
+		if(db == null){
+			throw new Exception("请先选择数据库");
+		}
+		sql = sql.trim();
+		if(sql.endsWith(";")){
+			sql = sql.substring(0, sql.length() - 1);
+		}
+		String dbId = String.valueOf(db.get("ID").toString());
+		Map<String, Object> tableInfo = new HashMap<>();
+		tableInfo.put("SQL", sql);
+		tableInfo.put("TYPE", "table");
+		// 从SQL中解析表名
+		String tableName = "";
+		Pattern ptn = Pattern.compile("from\\s+(.*)\\s*where?",Pattern.CASE_INSENSITIVE);
+		Matcher matcher = ptn.matcher(sql);
+		if(matcher.find()){
+			tableName = matcher.group(1).trim().toUpperCase();
+		}
+		tableInfo.put("TABLE_NAME", tableName);
+		List<String> list = compareService.getTableDataSql(dbId,tableInfo);
+		StringBuilder buf = new StringBuilder();
+		if(list != null && list.size() > 0){
+			for(String str : list){
+				buf.append("<data>").append(str).append("</data>\n");
+			}
+		}
+		retVal.put("data", buf.toString());
+		retVal.put("success", true);
+		return retVal;
 	}
 	
 	/**

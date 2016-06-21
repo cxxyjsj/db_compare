@@ -777,6 +777,19 @@ var escape = {
 					}
 				});
 			});
+			$("#genBtnSql").click(function(){
+				var sql = $("#sql").val();
+				if(!sql){
+					return;
+				}
+				$.post(basePath + "/genQueryScript",{sql : sql},function(resp){
+					if(resp.success){
+						$("#target").val(resp.data);
+					}else{
+						$.alert(resp.msg || "生成失败");
+					}
+				});
+			});
 		}
 }
 

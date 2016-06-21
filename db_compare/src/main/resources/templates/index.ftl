@@ -51,6 +51,9 @@
                                 <li>
                                 	<a href="#genTable">表结构生成</a>
                                 </li>
+                                <li>
+                                	<a href="#genQuery">查询数据生成</a>
+                                </li>
                             </ul>
                         </li>
                     </ul>
