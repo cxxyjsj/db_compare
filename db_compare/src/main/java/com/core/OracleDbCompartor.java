@@ -24,7 +24,7 @@ public class OracleDbCompartor extends AbstractDbCompartor {
 	@Override
 	public List<ColumnInfo> getColumns(Connection conn, String namePattern) throws Exception {
 		StringBuilder buf = new StringBuilder();
-		buf.append("SELECT B.TABLE_NAME,B.COLUMN_NAME,B.DATA_TYPE AS COLUMN_TYPE,B.DATA_LENGTH ")
+		buf.append("SELECT B.TABLE_NAME,B.COLUMN_NAME,B.DATA_TYPE AS COLUMN_TYPE,NVL(B.DATA_PRECISION,B.DATA_LENGTH) ")
 			 .append(" AS COLUMN_SIZE FROM USER_TABLES A LEFT JOIN USER_TAB_COLUMNS B ON A.TABLE_NAME ")
 			 .append(" = B.TABLE_NAME WHERE 1=1 ");
 		List<Object> params = new ArrayList<Object>();
