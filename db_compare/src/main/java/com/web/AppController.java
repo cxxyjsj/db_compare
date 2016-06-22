@@ -1009,7 +1009,7 @@ public class AppController {
 			String tableName = "";
 			// 从SQL中解析表名
 			Pattern ptn = Pattern.compile("from\\s+(.*)\\s*where?",Pattern.CASE_INSENSITIVE);
-			Matcher matcher = ptn.matcher(sql);
+			Matcher matcher = ptn.matcher(_sql);
 			if(matcher.find()){
 				tableName = matcher.group(1).trim().toUpperCase();
 			}
@@ -1068,5 +1068,12 @@ public class AppController {
 			conn.close();
 		}
 		return retVal;
+	}
+	
+	@RequestMapping("/genAppQuery")
+	public String genAppQuery(ModelMap model,HttpSession session)throws Exception {
+		model.put("dbs", DbUtil.query("SELECT ID,CODE,NAME FROM DB ORDER BY ID"));
+		model.put("db", session.getAttribute("db"));
+		return "escape/genAppQuery";
 	}
 }

@@ -54,6 +54,9 @@
                                 <li>
                                 	<a href="#genQuery">查询数据生成</a>
                                 </li>
+                                <li>
+                                	<a href="#genAppQuery">应用数据生成</a>
+                                </li>
                             </ul>
                         </li>
                     </ul>

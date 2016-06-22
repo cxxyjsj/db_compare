@@ -790,6 +790,25 @@ var escape = {
 					}
 				});
 			});
+			$("#genAppBtnSql").click(function(){
+				var yyid = $.trim($("#yyid").val());
+				if(!yyid){
+					return;
+				}
+				var sqls = [];
+				$("#sqls li").each(function(){
+					var sql = $.trim($(this).text());
+					sql = sql.replace("@APPNAME",yyid);
+					sqls.push(sql);
+				});
+				$.post(basePath + "/genQueryScript",{sql : sqls.join(";")},function(resp){
+					if(resp.success){
+						$("#target").val(resp.data);
+					}else{
+						$.alert(resp.msg || "生成失败");
+					}
+				});
+			});
 		}
 }
 
