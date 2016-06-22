@@ -18,8 +18,8 @@
 	            <div class="col-md-12">
 	            	<form>
 					    <div class="form-group">
-					        <label>请输入查询SQL</label>
-					        <input class="form-control" id="sql">
+					        <label>请输入查询SQL(多条查询使用分号换行)</label>
+					        <textarea id="sql" class="form-control" rows="8"></textarea>
 					    </div>
 					    <div class="form-group">
 					        <label>输出脚本</label>

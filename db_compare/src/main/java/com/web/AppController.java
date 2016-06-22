@@ -995,27 +995,30 @@ public class AppController {
 		if(db == null){
 			throw new Exception("请先选择数据库");
 		}
-		sql = sql.trim();
+		sql = sql.trim().replaceAll("\r|\n", "");
 		if(sql.endsWith(";")){
 			sql = sql.substring(0, sql.length() - 1);
 		}
-		String dbId = String.valueOf(db.get("ID").toString());
-		Map<String, Object> tableInfo = new HashMap<>();
-		tableInfo.put("SQL", sql);
-		tableInfo.put("TYPE", "table");
-		// 从SQL中解析表名
-		String tableName = "";
-		Pattern ptn = Pattern.compile("from\\s+(.*)\\s*where?",Pattern.CASE_INSENSITIVE);
-		Matcher matcher = ptn.matcher(sql);
-		if(matcher.find()){
-			tableName = matcher.group(1).trim().toUpperCase();
-		}
-		tableInfo.put("TABLE_NAME", tableName);
-		List<String> list = compareService.getTableDataSql(dbId,tableInfo);
+		String[] sqls = sql.split(";");
 		StringBuilder buf = new StringBuilder();
-		if(list != null && list.size() > 0){
-			for(String str : list){
-				buf.append("<data>").append(str).append("</data>\n");
+		for(String _sql : sqls){
+			String dbId = String.valueOf(db.get("ID").toString());
+			Map<String, Object> tableInfo = new HashMap<>();
+			tableInfo.put("SQL", _sql);
+			tableInfo.put("TYPE", "table");
+			String tableName = "";
+			// 从SQL中解析表名
+			Pattern ptn = Pattern.compile("from\\s+(.*)\\s*where?",Pattern.CASE_INSENSITIVE);
+			Matcher matcher = ptn.matcher(sql);
+			if(matcher.find()){
+				tableName = matcher.group(1).trim().toUpperCase();
+			}
+			tableInfo.put("TABLE_NAME", tableName);
+			List<String> list = compareService.getTableDataSql(dbId,tableInfo);
+			if(list != null && list.size() > 0){
+				for(String str : list){
+					buf.append("<data>").append(str).append("</data>\n");
+				}
 			}
 		}
 		retVal.put("data", buf.toString());
