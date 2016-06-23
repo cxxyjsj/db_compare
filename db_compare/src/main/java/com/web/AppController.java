@@ -1008,7 +1008,7 @@ public class AppController {
 			tableInfo.put("TYPE", "table");
 			String tableName = "";
 			// 从SQL中解析表名
-			Pattern ptn = Pattern.compile("from\\s+(.*)\\s*where?",Pattern.CASE_INSENSITIVE);
+			Pattern ptn = Pattern.compile("from\\s+(\\S+)\\s*",Pattern.CASE_INSENSITIVE);
 			Matcher matcher = ptn.matcher(_sql);
 			if(matcher.find()){
 				tableName = matcher.group(1).trim().toUpperCase();
