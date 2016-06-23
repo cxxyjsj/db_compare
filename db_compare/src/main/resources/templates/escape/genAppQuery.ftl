@@ -27,6 +27,7 @@
 								<li>SELECT * FROM T_RS_BPM_APP_PROCESSDEF WHERE APPNAME = '@APPNAME'</li>
 								<li>SELECT * FROM T_RS_XT_PROP WHERE XT = '@APPNAME' ORDER BY TO_NUMBER(WID)</li>
 								<li>SELECT * FROM T_RS_ZXBZ_ZDB WHERE YYID = '@APPNAME' ORDER BY TO_NUMBER(WID)</li>
+								<li>SELECT * FROM T_RS_XT_PAGEAREA WHERE YYID = '@APPNAME'</li>
 	            			</ul>
 	            		</div>
 					    <div class="form-group">
