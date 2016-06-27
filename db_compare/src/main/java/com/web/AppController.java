@@ -1001,17 +1001,25 @@ public class AppController {
 		}
 		String[] sqls = sql.split(";");
 		StringBuilder buf = new StringBuilder();
+		Pattern tableNamePtn = Pattern.compile("from\\s+(\\S+)\\s*",Pattern.CASE_INSENSITIVE);
+		Pattern queryPtn = Pattern.compile("^select.*",Pattern.CASE_INSENSITIVE);
 		for(String _sql : sqls){
+			_sql = _sql.trim();
+			// 判断sql是否为查询sql
+			if(!queryPtn.matcher(_sql).find()){
+				throw new Exception("无效的查询语句:" + _sql);
+			}
 			String dbId = String.valueOf(db.get("ID").toString());
 			Map<String, Object> tableInfo = new HashMap<>();
 			tableInfo.put("SQL", _sql);
 			tableInfo.put("TYPE", "table");
 			String tableName = "";
-			// 从SQL中解析表名
-			Pattern ptn = Pattern.compile("from\\s+(\\S+)\\s*",Pattern.CASE_INSENSITIVE);
-			Matcher matcher = ptn.matcher(_sql);
+			Matcher matcher = tableNamePtn.matcher(_sql);
 			if(matcher.find()){
 				tableName = matcher.group(1).trim().toUpperCase();
+			}
+			if(StringUtils.isEmpty(tableName)){
+				throw new Exception("无效的查询语句:" + _sql);
 			}
 			tableInfo.put("TABLE_NAME", tableName);
 			List<String> list = compareService.getTableDataSql(dbId,tableInfo);
