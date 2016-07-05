@@ -499,7 +499,7 @@ public class CompareService {
 	}
 	
 	public String convertValue(String name, Object value){
-		if("TBRQ".equals(name) || "TBLB".equals(name) || "CZRQ".equals(name)){
+		if("TBRQ".equals(name) || "TBLX".equals(name) || "CZRQ".equals(name)){
 			return "";
 		}
 		if("CZZ".equals(name)){

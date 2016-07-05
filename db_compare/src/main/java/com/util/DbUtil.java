@@ -25,6 +25,7 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.support.JdbcUtils;
 import org.springframework.stereotype.Component;
 
 import com.domain.ColumnInfo;
@@ -264,8 +265,8 @@ public class DbUtil {
 			List<Map<String, Object>> results = new ArrayList<Map<String, Object>>();
 			while (rs.next()) {
 				Map<String, Object> data = new LinkedHashMap<String, Object>();
-				for (String name : names) {
-					data.put(name, rs.getObject(name));
+				for(int i=0;i<names.size();i++){
+					data.put(names.get(i), JdbcUtils.getResultSetValue(rs, i+1));
 				}
 				results.add(data);
 			}
