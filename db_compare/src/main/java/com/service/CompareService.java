@@ -168,14 +168,16 @@ public class CompareService {
 	 * @param tarList
 	 * @return
 	 */
-	public String getChangeSql(String type, String tableName, List<ColumnInfo> srcList, List<ColumnInfo> tarList)throws Exception {
+	public String[] getChangeSql(String type, String tableName, List<ColumnInfo> srcList, List<ColumnInfo> tarList)throws Exception {
 		IDbCompartor idc = (IDbCompartor)SpringUtil.getBean("comparator." + type);
 		if(idc == null){
 			throw new Exception("暂未支持的数据库类型:" + type);
 		}
-		StringWriter sw = new StringWriter();
-		PrintWriter pw = new PrintWriter(sw);
-		pw.println("/* ---------- " + tableName + " ---------- */");
+		StringWriter swNormal = new StringWriter();
+		StringWriter swDanger = new StringWriter();
+		PrintWriter pwNormal = new PrintWriter(swNormal);
+		PrintWriter pwDanger = new PrintWriter(swDanger);
+		pwNormal.println("/* ---------- " + tableName + " ---------- */");
 		
 		// 1. 新增的字段
 		List<ColumnInfo> srcList2 = new ArrayList<ColumnInfo>(Arrays.asList(new ColumnInfo[srcList.size()]));
@@ -187,9 +189,9 @@ public class CompareService {
 		for(Iterator<String> iter = src2Map.keySet().iterator();iter.hasNext();){
 			String key = iter.next();
 			ColumnInfo col = src2Map.get(key);
-			pw.println(idc.getAddSql(col));
+			pwNormal.println(idc.getAddSql(col));
 		}
-		pw.println();
+		pwNormal.println();
 		
 		// 2. 更新的字段
 		Map<String, ColumnInfo> srcMap = convertMap(srcList);
@@ -203,19 +205,21 @@ public class CompareService {
 			}
 			if(!tarCol.getType().equals(srcCol.getType())){
 				// 类型不一致,执行可能会报错
-				pw.println("/*字段类型不一致,请注意是否兼容*/");
-				pw.println(idc.getModifySql(srcCol));
+				pwDanger.println("/*字段类型不一致,请注意是否兼容*/");
+				pwDanger.println(idc.getModifySql(srcCol));
 			}else{
 				// 如果目标字段长度比版本长度大则不更新
 				if(tarCol.getSize() < srcCol.getSize()){
-					pw.println(idc.getModifySql(srcCol));
+					pwNormal.println(idc.getModifySql(srcCol));
 				}
 			}
 		}
-		pw.println();
-		String result = sw.toString();
-		pw.close();
-		return result;
+		pwNormal.println();
+		String normalResult = swNormal.toString();
+		String dangerResult = swDanger.toString();
+		pwNormal.close();
+		pwDanger.close();
+		return new String[]{normalResult,dangerResult};
 	}
 	
 	/**

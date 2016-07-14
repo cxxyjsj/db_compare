@@ -515,11 +515,18 @@ public class AppController {
 				+ "WHERE VERSION_ID = ? AND TABLE_NAME = ? ORDER BY ID";
 		String type = (String)DbUtil.queryOne("SELECT TYPE FROM DB WHERE ID = (SELECT DB_ID FROM"
 				+ " VERSION WHERE ID = ?)", tarId);
+		List<String> dangerResult = new ArrayList<>();
 		for(String tableName : diffTables){
 			List<ColumnInfo> srcCols = DbUtil.queryColumns(sql, srcId,tableName);
 			List<ColumnInfo> tarCols = DbUtil.queryColumns(sql, tarId,tableName);
-			String result = compareService.getChangeSql(type, tableName, srcCols, tarCols);
-			pw.println(result);
+			String[] results = compareService.getChangeSql(type, tableName, srcCols, tarCols);
+			pw.println(results[0]);
+			if(!StringUtils.isEmpty(results[1])){
+				dangerResult.add(results[1]);
+			}
+		}
+		for(String line : dangerResult){
+			pw.println(line);
 		}
 		String results = sw.toString();
 		pw.close();
