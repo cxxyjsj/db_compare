@@ -46,7 +46,7 @@ public interface IDbCompartor {
 	 * @param col
 	 * @return
 	 */
-	public String getModifySql(ColumnInfo col);
+	public String getModifySql(ColumnInfo srcCol, ColumnInfo tarCol);
 	
 	/**
 	 * 获取创建表SQL

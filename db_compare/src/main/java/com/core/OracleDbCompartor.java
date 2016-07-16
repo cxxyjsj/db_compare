@@ -1,5 +1,7 @@
 package com.core;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -86,17 +88,45 @@ public class OracleDbCompartor extends AbstractDbCompartor {
 	}
 
 	@Override
-	public String getModifySql(ColumnInfo col) {
-		String sql = "ALTER TABLE " + col.getTableName() + " MODIFY (" 
-				+ col.getName() + " " + col.getType();
+	public String getModifySql(ColumnInfo srcCol, ColumnInfo tarCol) {
+		if(!tarCol.getType().equals(srcCol.getType())){
+			StringWriter sw = new StringWriter();
+			PrintWriter pw = new PrintWriter(sw);
+			pw.append("ALTER TABLE ").append(srcCol.getTableName()).append(" ADD ").append(srcCol.getName())
+			     .append("_TMP ").append(getColumnTypeStr(srcCol)).append(";").println();
+			pw.append("UPDATE ").append(srcCol.getTableName()).append(" SET ").append(srcCol.getName())
+				 .append("_TMP = ").append(srcCol.getName()).append(",").append(srcCol.getName()).append("=NULL;").println();;
+			pw.append("ALTER TABLE ").append(srcCol.getTableName()).append(" MODIFY (").append(srcCol.getName()).append(" ")
+			     .append(getColumnTypeStr(srcCol)).append(");").println();;
+			pw.append("UPDATE ").append(srcCol.getTableName()).append(" SET ").append(srcCol.getName())
+			     .append(" = ").append(srcCol.getName()).append("_TMP;").println();;
+			pw.append("ALTER TABLE ").append(srcCol.getTableName()).append(" DROP COLUMN ")
+			      .append(srcCol.getName()).append("_TMP;").println();;
+			return sw.toString();
+		}else{
+			String sql = "ALTER TABLE " + srcCol.getTableName() + " MODIFY (" 
+					+ srcCol.getName() + " " + srcCol.getType();
+			if(srcCol.getSize() > 0){
+				if("DATE".equals(srcCol.getType()) || "CLOB".equals(srcCol.getType()) || "BLOB".equals(srcCol.getType())){
+					
+				}else{
+					sql += "(" + srcCol.getSize() + ")";
+				}
+			}
+			sql += ");";
+			return sql;
+		}
+	}
+	
+	private String getColumnTypeStr(ColumnInfo col) {
+		String res = col.getType();
 		if(col.getSize() > 0){
 			if("DATE".equals(col.getType()) || "CLOB".equals(col.getType()) || "BLOB".equals(col.getType())){
 				
 			}else{
-				sql += "(" + col.getSize() + ")";
+				res += "(" + col.getSize() + ")";
 			}
 		}
-		sql += ");";
-		return sql;
+		return res;
 	}
 }
