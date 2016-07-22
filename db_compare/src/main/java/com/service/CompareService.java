@@ -513,11 +513,11 @@ public class CompareService {
 			return "管理员";
 		}
 		String retVal = value == null ? "" : value.toString();
+		// 过滤掉xml关键字符
+		retVal = retVal.replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll("\"", "&quot;");
 		// 过滤掉oracle关键字符
 		retVal = retVal.replaceAll("'", "' || chr(39) || '");
 		retVal = retVal.replaceAll("&", "' || chr(38) || '");
-		// 过滤掉xml关键字符
-		retVal = retVal.replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll("\"", "&quot;");
 		return retVal;
 	}
 }
