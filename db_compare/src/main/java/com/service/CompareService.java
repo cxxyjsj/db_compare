@@ -467,7 +467,7 @@ public class CompareService {
 					for(Map<String, Object> data : datas){
 						buf.setLength(0);
 						for(int i=0;i<names.length;i++){
-							buf.append("'").append(convertValue(names[i],data.get(names[i]))).append("'");
+							buf.append(convertValue(names[i],data.get(names[i])));
 							if(i < names.length - 1){
 								buf.append(",");
 							}
@@ -503,21 +503,26 @@ public class CompareService {
 	}
 	
 	public String convertValue(String name, Object value){
-		if("TBRQ".equals(name) || "TBLX".equals(name) || "CZRQ".equals(name)){
-			return "";
+		if("TBRQ".equals(name) || "TBLX".equals(name) || "CZRQ".equals(name) || value == null){
+			return "''";
 		}
 		if("CZZ".equals(name)){
-			return "ADMIN";
+			return "'ADMIN'";
 		}
 		if("CZZXM".equals(name)){
-			return "管理员";
+			return "'管理员'";
 		}
-		String retVal = value == null ? "" : value.toString();
-		// 过滤掉xml关键字符
-		retVal = retVal.replaceAll("<", "&lt;").replaceAll(">", "&gt;");
-		// 过滤掉oracle关键字符
-		retVal = retVal.replaceAll("'", "' || chr(39) || '");
-		retVal = retVal.replaceAll("&", "' || chr(38) || '");
-		return retVal;
+		if(value instanceof Date){
+			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+			return "TO_DATE('" + sdf.format((Date)value) + "','YYYY-MM-DD HH24:MI:SS')";
+		}else{
+			String retVal = value.toString();
+			// 过滤掉xml关键字符
+			retVal = retVal.replaceAll("<", "&lt;").replaceAll(">", "&gt;");
+			// 过滤掉oracle关键字符
+			retVal = retVal.replaceAll("'", "' || chr(39) || '");
+			retVal = retVal.replaceAll("&", "' || chr(38) || '");
+			return "'" + retVal + "'";
+		}
 	}
 }
