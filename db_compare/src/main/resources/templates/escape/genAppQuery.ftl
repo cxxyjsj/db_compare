@@ -29,6 +29,7 @@
 								<li>SELECT * FROM T_RS_ZXBZ_ZDB WHERE YYID = '@APPNAME' ORDER BY TO_NUMBER(WID)</li>
 								<li>SELECT * FROM T_RS_XT_PAGEAREA WHERE YYID = '@APPNAME'</li>
 								<li>SELECT * FROM T_RS_XT_TASK WHERE YYID = '@APPNAME'</li>
+								<li>SELECT * FROM T_RS_XT_TEMPLATE WHERE YYID = '@APPNAME'</li>
 	            			</ul>
 	            		</div>
 					    <div class="form-group">
