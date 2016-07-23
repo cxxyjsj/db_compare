@@ -514,7 +514,7 @@ public class CompareService {
 		}
 		String retVal = value == null ? "" : value.toString();
 		// 过滤掉xml关键字符
-		retVal = retVal.replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll("\"", "&quot;");
+		retVal = retVal.replaceAll("<", "&lt;").replaceAll(">", "&gt;");
 		// 过滤掉oracle关键字符
 		retVal = retVal.replaceAll("'", "' || chr(39) || '");
 		retVal = retVal.replaceAll("&", "' || chr(38) || '");
