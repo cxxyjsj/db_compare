@@ -956,8 +956,8 @@ public class AppController {
 			if("".equals(str)){
 				continue;
 			}
-			str = str.replaceAll("&", "' || chr(38) || '").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll("\"", "&quot;");
-			buf.append("<data>").append(str).append("</data>").append("\n");
+			str = str.replaceAll("&", "' || chr(38) || '").replaceAll("'", "' || chr(39) || '");
+			buf.append("<data><![CDATA[").append(str).append("]]></data>").append("\n");
 		}
 		retVal.put("success", true);
 		retVal.put("data", buf.toString());

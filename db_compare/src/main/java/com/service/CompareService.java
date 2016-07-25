@@ -454,7 +454,7 @@ public class CompareService {
 				if(datas != null && datas.size() > 0){
 					String[] names = datas.get(0).keySet().toArray(new String[0]);
 					StringBuilder buf = new StringBuilder();
-					buf.append("INSERT INTO ").append(tableName).append("(");
+					buf.append("<![CDATA[INSERT INTO ").append(tableName).append("(");
 					for(int i=0;i<names.length;i++){
 						buf.append(names[i]);
 						if(i < names.length - 1){
@@ -472,7 +472,7 @@ public class CompareService {
 								buf.append(",");
 							}
 						}
-						sqls.add(prefix + buf.toString() + ")");
+						sqls.add(prefix + buf.toString() + ")]]>");
 					}
 					return sqls;
 				}
@@ -518,7 +518,7 @@ public class CompareService {
 		}else{
 			String retVal = value.toString();
 			// 过滤掉xml关键字符
-			retVal = retVal.replaceAll("<", "&lt;").replaceAll(">", "&gt;");
+//			retVal = retVal.replaceAll("<", "&lt;").replaceAll(">", "&gt;");
 			// 过滤掉oracle关键字符
 			retVal = retVal.replaceAll("'", "' || chr(39) || '");
 			retVal = retVal.replaceAll("&", "' || chr(38) || '");
