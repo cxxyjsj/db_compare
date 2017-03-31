@@ -765,11 +765,11 @@ var escape = {
 				});
 			});
 			$("#genBtn").click(function(){
-				var tableName = $("#tableName").val();
-				if(!tableName){
+				var tableNameStr = $("#tableNameStr").val();
+				if(!tableNameStr){
 					return;
 				}
-				$.post(basePath + "/genTable/" + tableName,function(resp){
+				$.post(basePath + "/genTableScript",{tableNameStr : tableNameStr},function(resp){
 					if(resp.success){
 						$("#target").val(resp.data);
 					}else{

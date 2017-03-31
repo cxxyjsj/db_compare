@@ -18,8 +18,8 @@
 	            <div class="col-md-12">
 	            	<form>
 					    <div class="form-group">
-					        <label>请输入表名</label>
-					        <input class="form-control" id="tableName">
+					        <label>请输入表名匹配模式(例如：T_JZG_%)</label>
+					        <input class="form-control" id="tableNameStr">
 					    </div>
 					    <div class="form-group">
 					        <label>输出脚本</label>

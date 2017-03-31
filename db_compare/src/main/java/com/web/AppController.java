@@ -1049,36 +1049,48 @@ public class AppController {
 	 * @return
 	 * @throws Exception
 	 */
-	@RequestMapping("/genTable/{tableName}")
-	public @ResponseBody Map<String, Object> genTableScript(@PathVariable String tableName,HttpSession session)throws Exception {
+	@RequestMapping("/genTableScript")
+	public @ResponseBody Map<String, Object> genTableScript(@RequestParam String tableNameStr,HttpSession session)throws Exception {
 		Map<String, Object> retVal = new HashMap<>();
 		Map<String, Object> db =  (Map<String, Object>)session.getAttribute("db");
 		if(db == null){
 			throw new Exception("请先选择数据库");
 		}
-		tableName = tableName.toUpperCase();
+		tableNameStr = tableNameStr.toUpperCase();
 		String dbId = String.valueOf(db.get("ID").toString());
 		Connection conn = DbUtil.getConn(dbId);
 		try{
-			List<Map<String, Object>> cols = DbUtil.query(conn, "SELECT COLUMN_NAME,DATA_TYPE,NVL(DATA_PRECISION,DATA_LENGTH) AS DATA_LENGTH"
-					+ " FROM USER_TAB_COLUMNS WHERE TABLE_NAME = ? ORDER BY COLUMN_ID", tableName);
-			if(cols != null && cols.size() > 0){
-				Map<String, Object> table = new HashMap<>();
-				table.put("NAME", tableName);
-				for(Map<String, Object> col : cols){
-					String colName = (String)col.remove("COLUMN_NAME");
-					String colType = (String)col.remove("DATA_TYPE");
-					int colSize = Integer.valueOf(col.remove("DATA_LENGTH").toString());
-					col.put("NAME", colName);
-					col.put("TYPE", ColMapUtil.getScriptType(colType,colSize));
+			// 1. 查询表信息
+			List<Map<String, Object>> tables = DbUtil.query(conn, "SELECT A.TABLE_NAME,B.COMMENTS FROM USER_TABLES A LEFT JOIN USER_TAB_COMMENTS B " +
+					"ON A.TABLE_NAME = B.TABLE_NAME WHERE A.TABLE_NAME LIKE ? ORDER BY A.TABLE_NAME", tableNameStr);
+			List<Map<String, Object>> modelTables = new ArrayList<>();
+			for(Map<String, Object> table : tables) {
+				String tableName = (String) table.get("TABLE_NAME");
+				String comments = (String) table.get("COMMENTS");
+				Map<String, Object> modelTable = new HashMap<>();
+				modelTable.put("NAME", tableName);
+				modelTable.put("DESC", comments);
+				List<Map<String, Object>> cols = DbUtil.query(conn, "SELECT A.COLUMN_NAME,A.DATA_TYPE,NVL(A.DATA_PRECISION,A.DATA_LENGTH) AS DATA_LENGTH,"
+						+ " B.COMMENTS FROM USER_TAB_COLUMNS A LEFT JOIN USER_COL_COMMENTS B ON A.TABLE_NAME = B.TABLE_NAME AND A.COLUMN_NAME = B.COLUMN_NAME " +
+						" WHERE A.TABLE_NAME = ? ORDER BY COLUMN_ID", tableName);
+				if(cols != null && cols.size() > 0){
+					for(Map<String, Object> col : cols){
+						String colName = (String)col.remove("COLUMN_NAME");
+						String colType = (String)col.remove("DATA_TYPE");
+						int colSize = Integer.valueOf(col.remove("DATA_LENGTH").toString());
+						col.put("NAME", colName);
+						col.put("TYPE", ColMapUtil.getScriptType(colType,colSize));
+						col.put("DESC", col.remove("COMMENTS"));
+					}
+					modelTable.put("cols", cols);
+					modelTables.add(modelTable);
 				}
-				table.put("cols", cols);
-				Map<String, Object> model = new HashMap<>();
-				model.put("tables", Collections.singletonList(table));
-				String data = TemplateUtil.processTemplate("script/table_gen_script.ftl", model);
-				retVal.put("data", data);
-				retVal.put("success", true);
 			}
+			Map<String, Object> model = new HashMap<>();
+			model.put("tables", modelTables);
+			String data = TemplateUtil.processTemplate("script/table_gen_script.ftl", model);
+			retVal.put("data", data);
+			retVal.put("success", true);
 		}finally{
 			conn.close();
 		}
