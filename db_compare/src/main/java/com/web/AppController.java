@@ -1,22 +1,8 @@
 package com.web;
 
-import java.io.InputStream;
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.nio.charset.Charset;
-import java.sql.Connection;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
-
+import com.domain.ColumnInfo;
+import com.service.CompareService;
+import com.util.*;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -33,14 +19,16 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.domain.ColumnInfo;
-import com.service.CompareService;
-import com.util.ColMapUtil;
-import com.util.DbUtil;
-import com.util.HttpUtil;
-import com.util.JsonUtil;
-import com.util.StringUtil;
-import com.util.TemplateUtil;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
+import java.io.InputStream;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.nio.charset.Charset;
+import java.sql.Connection;
+import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * 前端控制器
@@ -55,6 +43,19 @@ public class AppController {
 	
 	@Autowired
 	private CompareService compareService;
+
+	private Map<String, String> defaultComments = new HashMap<>();
+
+	{
+		defaultComments.put("CZZ","操作者");
+		defaultComments.put("CZZXM","操作者姓名");
+		defaultComments.put("CZRQ","操作日期");
+		defaultComments.put("TBRQ","同步日期");
+		defaultComments.put("TBLX","同步类型");
+		defaultComments.put("WID","记录主键");
+		defaultComments.put("JZGBH","教职工编号");
+		defaultComments.put("ZGH","职工号");
+	}
 	
 	/**
 	 * 进入首页
@@ -88,7 +89,6 @@ public class AppController {
 	 * @author MX
 	 * @date 2016年3月18日 下午8:37:09
 	 * @param model
-	 * @param id
 	 * @return
 	 * @throws Exception
 	 */
@@ -108,7 +108,6 @@ public class AppController {
 	 * 删除数据库配置
 	 * @author MX
 	 * @date 2016年3月18日 下午9:37:40
-	 * @param model
 	 * @param id
 	 * @return
 	 * @throws Exception
@@ -125,7 +124,6 @@ public class AppController {
 	 * 保存数据库配置
 	 * @author MX
 	 * @date 2016年3月18日 下午9:48:36
-	 * @param model
 	 * @return
 	 * @throws Exception
 	 */
@@ -189,7 +187,6 @@ public class AppController {
 	 * @author cxxyjsj
 	 * @date 2016年5月8日 下午3:09:05
 	 * @param vId
-	 * @param tableName
 	 * @throws Exception
 	 */
 	@RequestMapping("/version/view/{vId}/tree")
@@ -341,7 +338,6 @@ public class AppController {
 	 * @author cxxyjsj
 	 * @date 2016年5月30日 下午9:21:23
 	 * @param file
-	 * @param DB_ID
 	 * @param request
 	 * @return
 	 * @throws Exception
@@ -487,7 +483,6 @@ public class AppController {
 	 * 导出变更脚本
 	 * @author cxxyjsj
 	 * @date 2016年5月1日 下午8:15:17
-	 * @param tableName
 	 * @param srcId
 	 * @param tarId
 	 * @return
@@ -634,7 +629,6 @@ public class AppController {
 	 * 添加应用
 	 * @author cxxyjsj
 	 * @date 2016年5月29日 下午2:04:40
-	 * @param model
 	 * @return
 	 * @throws Exception
 	 */
@@ -896,7 +890,6 @@ public class AppController {
 	 * @author cxxyjsj
 	 * @date 2016年6月11日 下午4:10:59
 	 * @param db
-	 * @param id
 	 * @return
 	 * @throws Exception
 	 */
@@ -930,7 +923,6 @@ public class AppController {
 	 * @author cxxyjsj
 	 * @date 2016年6月14日 下午6:42:31
 	 * @param model
-	 * @param session
 	 * @return
 	 * @throws Exception
 	 */
@@ -1045,7 +1037,6 @@ public class AppController {
 	 * 生成表结构脚本
 	 * @author cxxyjsj
 	 * @date 2016年6月14日 下午8:48:41
-	 * @param tableName
 	 * @return
 	 * @throws Exception
 	 */
@@ -1080,7 +1071,7 @@ public class AppController {
 						int colSize = Integer.valueOf(col.remove("DATA_LENGTH").toString());
 						col.put("NAME", colName);
 						col.put("TYPE", ColMapUtil.getScriptType(colType,colSize));
-						col.put("DESC", col.remove("COMMENTS"));
+						col.put("DESC", StringUtils.defaultString((String)col.remove("COMMENTS"),defaultComments.get(colName)));
 					}
 					modelTable.put("cols", cols);
 					modelTables.add(modelTable);
